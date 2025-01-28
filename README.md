@@ -1,2 +1,2 @@
 # ENSF 609 Capstone: Detecting Ransomware on Linux
-description here
+A software application that detects and removes ransomware on linux (Ubuntu) systems
