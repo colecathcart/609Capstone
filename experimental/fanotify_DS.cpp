@@ -7,8 +7,24 @@
        #include <stdlib.h>
        #include <sys/fanotify.h>
        #include <unistd.h>
+       #include <string.h>
+       #include <map>
+       #include <ctime>
+       #include <cmath>
 
-       /* Read all available fanotify events from the file descriptor 'fd'. */
+       #define BUFFER_SIZE 8192
+
+       std::map<std::string, time_t> modified_files;
+
+       // Function to check if the file has a suspicious extension
+       bool is_suspicious_extension(const char* filename) {
+        return (strstr(filename, ".locked") || strstr(filename, ".encrypted") || strstr(filename, ".crypt") || strstr(filename, ".ransomed"));
+       }
+
+       // Function to calculate entropy
+       
+
+
 
        static void
        handle_events(int fd)
