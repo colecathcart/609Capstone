@@ -12,6 +12,8 @@ class EntropyCalculator
 
         double get_entropy(const string& filepath) const;
 
+        double get_magic_bytes_entropy(const string& filepath) const;
+
         bool is_encrypted(double e1, double e2) const;
     
     private:
