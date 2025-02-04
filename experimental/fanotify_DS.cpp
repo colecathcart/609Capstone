@@ -81,9 +81,10 @@ void handle_events(int fanotify_fd) {
             if (readlink(path, resolved_path, sizeof(resolved_path) - 1) != -1) {
                 printf("Modified file: %s\n", resolved_path);
                 double entropy = calculate_entropy(resolved_path);
-                if (entropy > 7.5) {
-                    printf("WARNING: High entropy file detected: %s\n", resolved_path);
-                }
+                printf("Entropy: %f\n", entropy);
+                //if (entropy > 7.5) {
+                //    printf("WARNING: High entropy file detected: %s\n", resolved_path);
+                //} 
             }
         }
 
