@@ -62,6 +62,37 @@ double EntropyCalculator::get_magic_bytes_entropy(const string& filepath) const 
     return entropy;
 }
 
+bool EntropyCalculator::monobit_test(const string& filepath) const {
+    ifstream file(filepath, ios::binary);
+
+    if(!file) {
+        cerr << "Error opening file" << endl;
+        return 1;
+    }
+
+    char byte;
+    long size = 0;
+    long count1 = 0;
+
+    while (file.get(byte)) {
+        size ++;
+        for (int i= 7; i >= 0; i--) {
+            if(byte & (1 << i)){
+                count1++;
+            }
+        }
+    }
+
+    file.close();
+
+    int num_bits = size*8;
+    int sn = abs(count1 - (num_bits - count1));
+    int s_obs = sn / sqrt(num_bits);
+    double p_value = erfc(s_obs / sqrt(2));
+
+    return !(p_value < 0.01);
+}
+
 bool EntropyCalculator::is_encrypted(double e1, double e2) const {
     return 0;
 }
