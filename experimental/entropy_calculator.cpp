@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-    uint64_t map[256] = {0}; // Initialize the frequency map
+    uint64_t map[256] = {0}; // Frequency map
     size_t i;
     FILE *f;
     long int flen;
@@ -19,50 +19,50 @@ int main(int argc, char *argv[])
 
     printf("%s\n", argv[1]);
 
-    // Open the file
-    f = fopen(argv[1], "r");
+    // Open the file in binary mode
+    f = fopen(argv[1], "rb");
     if (!f)
     {
         fprintf(stderr, "Can't open %s\n", argv[1]);
         return 1;
     }
 
-    // Read the file and count the frequency of each byte
-    while (!feof(f))
-    {
-        char buf[1024 * 8];
-        size_t r;
-        r = fread(buf, 1, sizeof(buf), f);
-        if (r == 0)
-            break;
-        for (i = 0; i < r; i++)
-        {
-            size_t index = (unsigned char)buf[i];
-            map[index]++;
-        }
-    }
-
     // Get the file length
+    fseek(f, 0, SEEK_END);
     flen = ftell(f);
-    if (flen == -1L) {
+    if (flen == -1L)
+    {
         perror("ftell");
         fclose(f);
         return 1;
     }
+    rewind(f); // Reset file pointer to the beginning
+
+    // Read the file and count byte frequencies
+    while (!feof(f))
+    {
+        unsigned char buf[1024 * 8];
+        size_t r = fread(buf, 1, sizeof(buf), f);
+        if (r == 0)
+            break;
+        for (i = 0; i < r; i++)
+        {
+            map[buf[i]]++;
+        }
+    }
     fclose(f);
 
     // Calculate the entropy
-    for (i = 0; i < (sizeof(map) / sizeof(map[0])); i++)
+    for (i = 0; i < 256; i++)
     {
-        double freq;
         if (map[i] == 0)
             continue;
-        freq = (double)map[i] / flen;
+        double freq = (double)map[i] / flen;
         info += freq * log2(freq);
     }
     info = -info;
 
     // Print the entropy
-    printf("%f\n", info);
+    printf("Entropy: %f bits per byte\n", info);
     return 0;
 }
