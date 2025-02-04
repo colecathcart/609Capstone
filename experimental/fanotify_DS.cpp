@@ -22,7 +22,32 @@
        }
 
        // Function to calculate entropy
-       
+       double calculate_entropy(const char* filename) {
+        FILE* file = fopen(filename, "rb");
+        if (!file) return -1;
+
+        unsigned char buffer[1024];
+        int count[256] = {0};
+        int total_bytes = 0;
+
+        size_t bytes_read;
+        while ((bytes_read = fread(buffer, 1, sizeof(buffer), file)) > 0) {
+            for (size_t i = 0; i < bytes_read; i++) {
+                count[buffer[i]]++;
+                total_bytes++;
+            }
+        }
+        fclose(file);
+
+        double entropy = 0;
+        for (int i = 0; i < 256; i++) {
+            if (count[i] > 0) {
+                double p = (double)count[i] / total_bytes;
+                entropy -= p * log2(p);
+            }
+        }
+        return entropy;
+       }
 
 
 
