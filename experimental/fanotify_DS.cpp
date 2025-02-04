@@ -7,7 +7,8 @@
 #include <stdlib.h>
 #include <sys/fanotify.h>
 #include <unistd.h>
-#include <string.h>
+#include <string>
+#include <cstring>
 #include <map>
 #include <ctime>
 #include <cmath>
