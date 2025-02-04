@@ -82,86 +82,35 @@ void handle_events(int fanotify_fd) {
     }
 }
 
-int main(int argc, char *argv[])
-{
-    char buf;
-    int fd, poll_num;
-    nfds_t nfds;
-    struct pollfd fds[2];
-
-    /* Check mount point is supplied. */
-
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s MOUNT\n", argv[0]);
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <mount point>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    printf("Press enter key to terminate.\n");
-
-    /* Create the file descriptor for accessing the fanotify API. */
-
-    fd = fanotify_init(FAN_CLOEXEC | FAN_CLASS_CONTENT | FAN_NONBLOCK,
-                        O_RDONLY | O_LARGEFILE);
-    if (fd == -1) {
+    int fanotify_fd = fanotify_init(FAN_CLOEXEC | FAN_CLASS_CONTENT | FAN_NONBLOCK, O_RDONLY);
+    if (fanotify_fd == -1) {
         perror("fanotify_init");
         exit(EXIT_FAILURE);
     }
 
-    /* Mark the mount for:
-        - permission events before opening files
-        - notification events after closing a write-enabled
-        file descriptor. */
-
-    if (fanotify_mark(fd, FAN_MARK_ADD | FAN_MARK_MOUNT,
-                        FAN_OPEN_PERM | FAN_CLOSE_WRITE, AT_FDCWD,
-                        argv[1]) == -1) {
+    if (fanotify_mark(fanotify_fd, FAN_MARK_ADD | FAN_MARK_MOUNT, FAN_OPEN_PERM | FAN_CLOSE_WRITE, AT_FDCWD, argv[1]) == -1) {
         perror("fanotify_mark");
         exit(EXIT_FAILURE);
     }
 
-    /* Prepare for polling. */
-
-    nfds = 2;
-
-    fds[0].fd = STDIN_FILENO;       /* Console input */
-    fds[0].events = POLLIN;
-
-    fds[1].fd = fd;                 /* Fanotify input */
-    fds[1].events = POLLIN;
-
-    /* This is the loop to wait for incoming events. */
-
-    printf("Listening for events.\n");
+    struct pollfd fds[2] = {{.fd = STDIN_FILENO, .events = POLLIN}, {.fd = fanotify_fd, .events = POLLIN}};
+    printf("Monitoring file access on %s. Press Enter to stop.\n", argv[1]);
 
     while (1) {
-        poll_num = poll(fds, nfds, -1);
-        if (poll_num == -1) {
-            if (errno == EINTR)     /* Interrupted by a signal */
-                continue;           /* Restart poll() */
-
-            perror("poll");         /* Unexpected error */
-            exit(EXIT_FAILURE);
+        if (poll(fds, 2, -1) > 0 && fds[0].revents & POLLIN) {
+            break;
         }
-
-        if (poll_num > 0) {
-            if (fds[0].revents & POLLIN) {
-
-                /* Console input is available: empty stdin and quit. */
-
-                while (read(STDIN_FILENO, &buf, 1) > 0 && buf != '\n')
-                    continue;
-                break;
-            }
-
-            if (fds[1].revents & POLLIN) {
-
-                /* Fanotify events are available. */
-
-                handle_events(fd);
-            }
+        if (fds[1].revents & POLLIN) {
+            handle_events(fanotify_fd);
         }
     }
 
-    printf("Listening for events stopped.\n");
-    exit(EXIT_SUCCESS);
+    close(fanotify_fd);
+    return 0;
 }
