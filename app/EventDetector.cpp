@@ -83,10 +83,20 @@ class EventDetector {
         }
 
         void loq_event(const Event& event) {
+            std::cout << "[" << std::ctime(&event.timestamp) << "] " << event.event_type << " - " << event.filepath << " (" << event.filename << ")" << std::endl;
+        }
+
+        void enqueue_event(const Event& event) {
             if (event_queue.size() >= max_queue_size) {
                 event_queue.pop();
             }
             event_queue.push(event);
         }
+};
 
-        
+int main() {
+    EventDetector detector;
+    detector.add_watch("/tmp");
+    detector.process_events();
+    return 0;
+}
