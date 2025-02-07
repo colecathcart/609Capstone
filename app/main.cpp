@@ -1,8 +1,16 @@
 
 #include <iostream>
+#include "entropycalculator.h"
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    cout << "Hello World\n";
+    if (argc < 2) {
+        cout << "Error: must specify a filepath" << endl;
+        return -1;
+    }
+    EntropyCalculator ec;
+    cout << "File entropy: " << ec.get_shannon_entropy(argv[1]) << endl;
+    bool is_random = ec.monobit_test(argv[1]);
+    cout << "Monobit result: " << is_random << endl;
 }
