@@ -1,13 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <chrono>
-#include <ctime>
-#include <cstring>
-#include <fcntl.h>
-#include <sys/fanotify.h>
-#include <unistd.h>
-#include <linux/limits.h>
+#include "EventDetector.h"
 
 struct Event {
     std::string event_type;
