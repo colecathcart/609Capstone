@@ -1,7 +1,7 @@
 #include "EventDetector.h"
 
 EventDetector::EventDetector() {
-    fanotify_fd = fanotify_init(FAN_CLASS_CONTENT | FAN_NONBLOCK, O_RDONLY);
+    fanotify_fd = fanotify_init(FAN_CLASS_NOTIF | FAN_REPORT_FID, O_RDONLY);
     if (fanotify_fd == -1) {
         perror("fanotify_init");
         exit(EXIT_FAILURE);
@@ -13,7 +13,7 @@ EventDetector::~EventDetector() {
 }
 
 void EventDetector::add_watch(const std::string& path) {
-    if (fanotify_mark(fanotify_fd, FAN_MARK_ADD | FAN_MARK_MOUNT, FAN_OPEN | FAN_CLOSE_WRITE | FAN_EVENT_ON_CHILD, AT_FDCWD, path.c_str()) == -1) {
+    if (fanotify_mark(fanotify_fd, FAN_MARK_ADD | FAN_MARK_MOUNT, FAN_CREATE | FAN_OPEN | FAN_CLOSE_WRITE | FAN_DELETE | FAN_EVENT_ON_CHILD, AT_FDCWD, path.c_str()) == -1) {
         perror("fanotify_mark");
         exit(EXIT_FAILURE);
     } else {
@@ -37,7 +37,10 @@ void EventDetector::process_events() {
                 char filepath[PATH_MAX];
                 sprintf(filepath, "/proc/self/fd/%d", metadata->fd);
                 char resolved_path[PATH_MAX];
-                ssize_t path_length = readlink(filepath, resolved_path, PATH_MAX);
+                ssize_t path_length =(filepath, resolved_path, PATH_MAX - 1);
+                if (path_length >= 0) {
+                    resolved_path[path_length] = '\0';
+                }
                 resolved_path[path_length] = '\0';
                 close(metadata->fd);
 
@@ -49,7 +52,8 @@ void EventDetector::process_events() {
                 std::string path_str(resolved_path);
                 size_t last_slash = path_str.find_last_of("/");
                 std::string filename = path_str.substr(last_slash + 1);
-                std::string extension = filename.substr(filename.find_last_of(".") + 1);
+                size_t dot_pos = filename.find_last_of(".");
+                std::string extension = (dot_pos != std::string::npos) ? filename.substr(dot_pos + 1) : "";
 
                 Event event = {event_type, path_str, filename, extension, std::time(nullptr)};
                 log_event(event);
