@@ -68,10 +68,3 @@ void EventDetector::enqueue_event(const Event& event) {
     }
     event_queue.push(event);
 }
-
-int main() {
-    EventDetector detector;
-    detector.add_watch("/tmp");
-    detector.process_events();
-    return 0;
-}
