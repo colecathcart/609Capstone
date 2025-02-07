@@ -1,7 +1,7 @@
 #include "EventDetector.h"
 
 EventDetector::EventDetector() {
-    fanotify_fd = fanotify_init(FAN_CLASS_NOTIF | FAN_NONBLOCK, O_RDONLY);
+    fanotify_fd = fanotify_init(FAN_CLASS_NOTIF | FAN_REPORT_FID, O_RDWR);
     if (fanotify_fd == -1) {
         perror("fanotify_init");
         exit(EXIT_FAILURE);
@@ -13,7 +13,7 @@ EventDetector::~EventDetector() {
 }
 
 void EventDetector::add_watch(const std::string& path) {
-    if (fanotify_mark(fanotify_fd, FAN_MARK_ADD | FAN_MARK_MOUNT, FAN_CREATE | FAN_DELETE | FAN_CLOSE_WRITE | FAN_EVENT_ON_CHILD, AT_FDCWD, path.c_str()) == -1) {
+    if (fanotify_mark(fanotify_fd, FAN_MARK_ADD, FAN_CREATE | FAN_DELETE | FAN_EVENT_ON_CHILD, AT_FDCWD, path.c_str()) == -1) {
         perror("fanotify_mark");
         exit(EXIT_FAILURE);
     } else {

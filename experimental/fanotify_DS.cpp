@@ -122,7 +122,7 @@ main(int argc, char *argv[])
 
     /* Create the file descriptor for accessing the fanotify API. */
 
-    fd = fanotify_init(FAN_CLOEXEC | FAN_CLASS_CONTENT | FAN_NONBLOCK,
+    fd = fanotify_init(FAN_CLASS_NOTIF | FAN_REPORT_FID | FAN_REPORT_FID,
                         O_RDONLY | O_LARGEFILE);
     if (fd == -1) {
         perror("fanotify_init");
@@ -134,8 +134,8 @@ main(int argc, char *argv[])
         - notification events after closing a write-enabled
         file descriptor. */
 
-    if (fanotify_mark(fd, FAN_MARK_ADD | FAN_MARK_MOUNT,
-                        FAN_CREATE | FAN_CLOSE_WRITE, AT_FDCWD,
+    if (fanotify_mark(fd, FAN_MARK_ADD,
+                        FAN_CREATE | FAN_DELETE | FAN_MODIFY | FAN_EVENT_ON_CHILD, AT_FDCWD,
                         argv[1]) == -1) {
         perror("fanotify_mark");
         exit(EXIT_FAILURE);
