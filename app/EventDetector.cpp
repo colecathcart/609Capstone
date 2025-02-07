@@ -13,7 +13,7 @@ EventDetector::~EventDetector() {
 }
 
 void EventDetector::add_watch(const std::string& path) {
-    if (fanotify_mark(fanotify_fd, FAN_MARK_ADD, FAN_CREATE | FAN_DELETE | FAN_EVENT_ON_CHILD, AT_FDCWD, path.c_str()) == -1) {
+    if (fanotify_mark(fanotify_fd, FAN_MARK_ADD, FAN_CREATE | FAN_DELETE | FAN_EVENT_ON_CHILD | FAN_CLOSE_WRITE, AT_FDCWD, path.c_str()) == -1) {
         perror("fanotify_mark");
         exit(EXIT_FAILURE);
     } else {
