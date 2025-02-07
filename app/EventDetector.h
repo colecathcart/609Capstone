@@ -66,6 +66,13 @@ public:
      * @param event The event to be stored.
      */
     void enqueue_event(const Event &event);
+
+    /**
+     * @brief Retrieves the fanotify file descriptor.
+     * @return The fanotify file descriptor.
+     */
+
+    int get_fanotify_fd() const;
 };
 
 #endif // EVENT_DETECTOR_H

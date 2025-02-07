@@ -71,3 +71,7 @@ void EventDetector::enqueue_event(const Event& event) {
     }
     event_queue.push(event);
 }
+
+int EventDetector::get_fanotify_fd() const {
+    return fanotify_fd;
+}
