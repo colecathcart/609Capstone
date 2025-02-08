@@ -44,7 +44,7 @@ void EventDetector::process_events() {
             if (metadata->fd == -1 && (metadata->vers >= 3)) {
                 struct fanotify_event_info_fid *fid_info =
                     (struct fanotify_event_info_fid *)(metadata + 1);
-                struct file_handle *file_handle = &fid_info->handle;
+                struct file_handle *file_handle = (struct file_handle *)fid_info->handle;
 
                 // Retrieve the file path using name_to_handle_at or open_by_handle_at
                 char filepath[PATH_MAX];
