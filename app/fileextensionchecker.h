@@ -20,10 +20,10 @@ class FileExtensionChecker
         FileExtensionChecker();
 
         /**
-         * @brief Checks if a file extension is a ZIP.
+         * @brief Checks if a file extension represents a compressed file.
          * @param filepath The path to the file to be tested.
          */
-        bool is_zip(const string& filepath) const;
+        bool is_compressed(const string& filepath) const;
 
         /**
          * @brief Checks if a file extension is suspicious.
@@ -32,7 +32,7 @@ class FileExtensionChecker
         bool is_suspicious(const string& filepath) const;
 
         /**
-         * @brief Checks if a file extension is an image.
+         * @brief Checks if a file extension represents an image.
          * @param filepath The path to the file to be tested.
          */
         bool is_image(const string& filepath) const;
@@ -40,9 +40,9 @@ class FileExtensionChecker
     private:
 
         /**
-         * @brief A set of known ZIP file extensions.
+         * @brief A set of known compressed file extensions.
          */
-        static const unordered_set<string> known_zips;
+        static const unordered_set<string> known_compressed;
 
         /**
          * @brief A set of known suspicious file extensions.
@@ -53,6 +53,12 @@ class FileExtensionChecker
          * @brief A set of known image file extensions.
          */
         static const unordered_set<string> known_images;
+
+        /**
+         * @brief Returns an extension of a file.
+         * @param filepath The path to the file.
+         */
+        string get_extension(const string& filepath) const;
 };
 
 #endif
