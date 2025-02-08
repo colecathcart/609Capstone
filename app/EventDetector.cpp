@@ -40,25 +40,52 @@ void EventDetector::process_events() {
                 event.event_type = "unknown";
             }
 
-            char filepath[PATH_MAX];
-            snprintf(filepath, PATH_MAX, "/proc/self/fd/%d", metadata->fd);
-            ssize_t len = readlink(filepath, filepath, PATH_MAX);
-            if (len != -1) {
-                filepath[len] = '\0';
-                event.filepath = filepath;
-                std::string filename = filepath;
-                size_t pos = filename.find_last_of("/");
-                event.filename = (pos != std::string::npos) ? filename.substr(pos + 1) : filename;
-                size_t ext_pos = event.filename.find_last_of(".");
-                event.extension = (ext_pos != std::string::npos) ? event.filename.substr(ext_pos + 1) : "";
-                enqueue_event(event);
-                log_event(event);
+            // Handle FAN_REPORT_FID case
+            if (metadata->fd == -1 && (metadata->vers >= 3)) {
+                struct fanotify_event_info_fid *fid_info =
+                    (struct fanotify_event_info_fid *)(metadata + 1);
+                struct file_handle *file_handle = (struct file_handle *)fid_info->handle;
+
+                // Retrieve the file path using name_to_handle_at or open_by_handle_at
+                char filepath[PATH_MAX];
+                int dir_fd = open("/", O_PATH); // Root directory for lookup
+                int file_fd = open_by_handle_at(dir_fd, file_handle, O_RDONLY);
+                if (file_fd != -1) {
+                    ssize_t len = readlink(("/proc/self/fd/" + std::to_string(file_fd)).c_str(), filepath, PATH_MAX);
+                    if (len != -1) {
+                        filepath[len] = '\0';
+                        event.filepath = filepath;
+                    }
+                    close(file_fd);
+                }
+                close(dir_fd);
+            } else {
+                // Handle normal file descriptor case
+                char filepath[PATH_MAX];
+                snprintf(filepath, PATH_MAX, "/proc/self/fd/%d", metadata->fd);
+                ssize_t len = readlink(filepath, filepath, PATH_MAX);
+                if (len != -1) {
+                    filepath[len] = '\0';
+                    event.filepath = filepath;
+                }
+                close(metadata->fd);
             }
-            close(metadata->fd);
+
+            // Extract filename and extension
+            std::string filename = event.filepath;
+            size_t pos = filename.find_last_of("/");
+            event.filename = (pos != std::string::npos) ? filename.substr(pos + 1) : filename;
+            size_t ext_pos = event.filename.find_last_of(".");
+            event.extension = (ext_pos != std::string::npos) ? event.filename.substr(ext_pos + 1) : "";
+
+            enqueue_event(event);
+            log_event(event);
+
             metadata = FAN_EVENT_NEXT(metadata, length);
         }
     }
 }
+
 
 
 void EventDetector::log_event(const Event& event) {
