@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "entropycalculator.h"
+#include "entropy_calculator.h"
 #include "file_extension_checker.h"
 
 using namespace std;
