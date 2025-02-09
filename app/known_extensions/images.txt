@@ -1,0 +1,11 @@
+jpg
+jpeg
+png
+gif
+tiff
+tif
+bmp
+webp
+ico
+svg
+heic

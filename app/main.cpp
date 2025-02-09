@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include "entropycalculator.h"
-#include "fileextensionchecker.h"
+#include "file_extension_checker.h"
 
 using namespace std;
 

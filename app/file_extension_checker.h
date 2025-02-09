@@ -59,6 +59,12 @@ class FileExtensionChecker
          * @param filepath The path to the file.
          */
         string get_extension(const string& filepath) const;
+
+        /**
+         * @brief loads known extensions stored in a file into an unordered set.
+         * @param filename The name of the file.
+         */
+        static unordered_set<string> load_known_extensions(const string& filename);
 };
 
 #endif
