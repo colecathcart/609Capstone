@@ -1,4 +1,4 @@
-#include "entropycalculator.h"
+#include "entropy_calculator.h"
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
