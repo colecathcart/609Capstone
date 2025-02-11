@@ -2,7 +2,7 @@
 
 EventDetector::EventDetector() {
     std::cout << "Initializing EventDetector..." << std::endl;
-    fanotify_fd = fanotify_init(FAN_CLASS_NOTIF | FAN_REPORT_FID, O_RDWR);
+    fanotify_fd = fanotify_init(FAN_CLASS_NOTIF | FAN_REPORT_DFID_NAME, 0);
     if (fanotify_fd == -1) {
         perror("fanotify_init");
         exit(EXIT_FAILURE);
@@ -17,7 +17,14 @@ EventDetector::~EventDetector() {
 
 void EventDetector::add_watch(const std::string& path) {
     std::cout << "Adding watch for path: " << path << std::endl;
-    if (fanotify_mark(fanotify_fd, FAN_MARK_ADD, FAN_CREATE | FAN_DELETE | FAN_EVENT_ON_CHILD | FAN_CLOSE_WRITE, AT_FDCWD, path.c_str()) == -1) {
+    mount_fd = open(path.c_str(), O_DIRECTORY | O_RDONLY);
+    if (mount_fd == -1) {
+        perror(path.c_str());
+        exit(EXIT_FAILURE);
+    }
+
+    ret = fanotify_mark(fanotify_fd, FAN_MARK_ADD | FAN_MARK_ONLYDIR, FAN_CREATE | FAN_DELETE | FAN_EVENT_ON_CHILD | FAN_CLOSE_WRITE | FAN_ONDIR, AT_FDCWD, path.c_str());
+    if (ret == -1) {
         perror("fanotify_mark");
         exit(EXIT_FAILURE);
     } else {
@@ -26,84 +33,110 @@ void EventDetector::add_watch(const std::string& path) {
 }
 
 void EventDetector::process_events() {
-    std::cout << "Processing events..." << std::endl;
-    char buffer[4096];
-    ssize_t length = read(fanotify_fd, buffer, sizeof(buffer));
-    std::cout << "Read " << length << " bytes from fanotify_fd." << std::endl;
+    int event_fd;
+    ssize_t size, path_len;
+    char path[PATH_MAX];
+    char procfd_path[PATH_MAX];
+    char events_buf[4096];
+    struct file_handle *file_handle;
+    struct fanotify_event_metadata *metadata;
+    struct fanotify_event_info_fid *fid;
+    const char *file_name;
+    struct stat sb;
 
-    if (length > 0) {
-        struct fanotify_event_metadata *metadata = (struct fanotify_event_metadata *)buffer;
-        while (FAN_EVENT_OK(metadata, length)) {
-            Event event;
-            event.time = std::time(nullptr);
-            std::cout << "Event detected at time: " << std::ctime(&event.time) << std::endl;
+    /* Read events from the event queue into a buffer. */
 
-            if (metadata->mask & FAN_CREATE) {
-                event.event_type = "create";
-                std::cout << "Event type: create" << std::endl;
-            } else if (metadata->mask & FAN_DELETE) {
-                event.event_type = "delete";
-                std::cout << "Event type: delete" << std::endl;
-            } else if (metadata->mask & FAN_CLOSE_WRITE) {
-                event.event_type = "write";
-                std::cout << "Event type: write" << std::endl;
-            } else {
-                event.event_type = "unknown";
-                std::cout << "Event type: unknown" << std::endl;
-            }
-
-            // Handle FAN_REPORT_FID case
-            if (metadata->fd == -1 && (metadata->vers >= 3)) {
-                std::cout << "Handling FAN_REPORT_FID case..." << std::endl;
-                struct fanotify_event_info_fid *fid_info =
-                    (struct fanotify_event_info_fid *)(metadata + 1);
-                struct file_handle *file_handle = (struct file_handle *)fid_info->handle;
-
-                // Retrieve the file path using name_to_handle_at or open_by_handle_at
-                char filepath[PATH_MAX];
-                int dir_fd = open("/", O_PATH); // Root directory for lookup
-                int file_fd = open_by_handle_at(dir_fd, file_handle, O_RDONLY);
-                if (file_fd != -1) {
-                    ssize_t len = readlink(("/proc/self/fd/" + std::to_string(file_fd)).c_str(), filepath, PATH_MAX);
-                    if (len != -1) {
-                        filepath[len] = '\0';
-                        event.filepath = filepath;
-                        std::cout << "Filepath resolved to: " << event.filepath << std::endl;
-                    }
-                    close(file_fd);
-                }
-                close(dir_fd);
-            } else {
-                // Handle normal file descriptor case
-                std::cout << "Handling normal file descriptor case..." << std::endl;
-                char filepath[PATH_MAX];
-                snprintf(filepath, PATH_MAX, "/proc/self/fd/%d", metadata->fd);
-                ssize_t len = readlink(filepath, filepath, PATH_MAX);
-                if (len != -1) {
-                    filepath[len] = '\0';
-                    event.filepath = filepath;
-                    std::cout << "Filepath resolved to: " << event.filepath << std::endl;
-                }
-                close(metadata->fd);
-            }
-
-            // Extract filename and extension
-            std::string filename = event.filepath;
-            size_t pos = filename.find_last_of("/");
-            event.filename = (pos != std::string::npos) ? filename.substr(pos + 1) : filename;
-            size_t ext_pos = event.filename.find_last_of(".");
-            event.extension = (ext_pos != std::string::npos) ? event.filename.substr(ext_pos + 1) : "";
-
-            std::cout << "Filename: " << event.filename << ", Extension: " << event.extension << std::endl;
-
-            enqueue_event(event);
-            log_event(event);
-
-            metadata = FAN_EVENT_NEXT(metadata, length);
-        }
-    } else {
-        std::cout << "No events processed, length <= 0." << std::endl;
+    size = read(fanotify_fd, events_buf, sizeof(events_buf));
+    if (size == -1 && errno != EAGAIN) {
+        perror("read");
+        exit(EXIT_FAILURE);
     }
+
+    /* Process all events within the buffer. */
+
+    for (metadata = (struct fanotify_event_metadata *) events_buf;
+            FAN_EVENT_OK(metadata, size);
+            metadata = FAN_EVENT_NEXT(metadata, size)) {
+        fid = (struct fanotify_event_info_fid *) (metadata + 1);
+        file_handle = (struct file_handle *) fid->handle;
+
+        /* Ensure that the event info is of the correct type. */
+
+        if (fid->hdr.info_type == FAN_EVENT_INFO_TYPE_FID ||
+            fid->hdr.info_type == FAN_EVENT_INFO_TYPE_DFID) {
+            file_name = NULL;
+        } else if (fid->hdr.info_type == FAN_EVENT_INFO_TYPE_DFID_NAME) {
+            file_name = (const char *)(file_handle->f_handle +
+                        file_handle->handle_bytes);
+        } else {
+            fprintf(stderr, "Received unexpected event info type.\n");
+            exit(EXIT_FAILURE);
+        }
+
+        if (metadata->mask == FAN_CREATE)
+            printf("FAN_CREATE (file created):\n");
+
+        if (metadata->mask == (FAN_CREATE | FAN_ONDIR))
+            printf("FAN_CREATE | FAN_ONDIR (subdirectory created):\n");
+
+    /* metadata->fd is set to FAN_NOFD when the group identifies
+        objects by file handles.  To obtain a file descriptor for
+        the file object corresponding to an event you can use the
+        struct file_handle that's provided within the
+        fanotify_event_info_fid in conjunction with the
+        open_by_handle_at(2) system call.  A check for ESTALE is
+        done to accommodate for the situation where the file handle
+        for the object was deleted prior to this system call. */
+
+        event_fd = open_by_handle_at(mount_fd, file_handle, O_RDONLY);
+        if (event_fd == -1) {
+            if (errno == ESTALE) {
+                printf("File handle is no longer valid. "
+                        "File has been deleted\n");
+                continue;
+            } else {
+                perror("open_by_handle_at");
+                exit(EXIT_FAILURE);
+            }
+        }
+
+        snprintf(procfd_path, sizeof(procfd_path), "/proc/self/fd/%d",
+                event_fd);
+
+        /* Retrieve and print the path of the modified dentry. */
+
+        path_len = readlink(procfd_path, path, sizeof(path) - 1);
+        if (path_len == -1) {
+            perror("readlink");
+            exit(EXIT_FAILURE);
+        }
+
+        path[path_len] = '\0';
+        printf("\tDirectory '%s' has been modified.\n", path);
+
+        if (file_name) {
+            ret = fstatat(event_fd, file_name, &sb, 0);
+            if (ret == -1) {
+                if (errno != ENOENT) {
+                    perror("fstatat");
+                    exit(EXIT_FAILURE);
+                }
+                printf("\tEntry '%s' does not exist.\n", file_name);
+            } else if ((sb.st_mode & S_IFMT) == S_IFDIR) {
+                printf("\tEntry '%s' is a subdirectory.\n", file_name);
+            } else {
+                printf("\tEntry '%s' is not a subdirectory.\n",
+                        file_name);
+            }
+        }
+
+        /* Close associated file descriptor for this event. */
+
+        close(event_fd);
+    }
+
+
+
 }
 
 void EventDetector::log_event(const Event& event) {
