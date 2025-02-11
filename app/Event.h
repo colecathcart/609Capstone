@@ -15,19 +15,15 @@ private:
 
 public:
     Event(const std::string& type, const std::string& path, 
-          const std::string& name, const std::string& ext, std::time_t timestamp)
-        : event_type(type), filepath(path), filename(name), extension(ext), time(timestamp) {}
+          const std::string& name, const std::string& ext, std::time_t timestamp);
 
-    std::string get_event_type() const { return event_type; }
-    std::string get_filepath() const { return filepath; }
-    std::string get_filename() const { return filename; }
-    std::string get_extension() const { return extension; }
-    std::time_t get_time() const { return time; }
+    std::string get_event_type() const;
+    std::string get_filepath() const;
+    std::string get_filename() const;
+    std::string get_extension() const;
+    std::time_t get_time() const;
 
-    void print() const {
-        std::cout << "Event Type: " << event_type << ", File: " << filepath 
-                  << ", Timestamp: " << time << std::endl;
-    }
+    void print() const;
 };
 
 #endif // EVENT
