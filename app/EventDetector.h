@@ -13,17 +13,7 @@
 #include <sys/fanotify.h>
 #include <unistd.h>
 #include <linux/limits.h>
-
-/**
- * @brief Structure to store file event details.
- */
-struct Event {
-    std::string event_type; ///< Type of event (write or delete)
-    std::string filepath;   ///< Full path of the affected file
-    std::string filename;   ///< Name of the affected file
-    std::string extension;  ///< File extension
-    std::time_t time;       ///< Timestamp of the event
-};
+#include "Event.h"
 
 /**
  * @brief Class to monitor file system events using fanotify.

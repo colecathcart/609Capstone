@@ -140,11 +140,11 @@ void EventDetector::process_events() {
 }
 
 void EventDetector::log_event(const Event& event) {
-    std::cout << "[" << std::ctime(&event.time) << "] " << event.event_type << " - " << event.filepath << " (" << event.filename << ")" << std::endl;
+    event.print();
 }
 
 void EventDetector::enqueue_event(const Event& event) {
-    std::cout << "Enqueuing event: " << event.event_type << " - " << event.filepath << std::endl;
+    std::cout << "Enqueuing event: " << event.get_event_type() << " - " << event.get_filepath() << std::endl;
     if (event_queue.size() >= max_queue_size) {
         std::cout << "Event queue is full, popping an event." << std::endl;
         event_queue.pop();
