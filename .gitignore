@@ -1,3 +1,4 @@
 **/a.out
 app/app
 **/*.o
+settings.json

@@ -7,7 +7,7 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
     EventDetector detector;
-    detector.add_watch("/tmp");
+    detector.add_watch("/home/destin/Documents");
 
     struct pollfd pfd;
     pfd.fd = detector.get_fanotify_fd();
