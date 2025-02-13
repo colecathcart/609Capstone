@@ -110,6 +110,19 @@ void EventDetector::process_events() {
                 path[path_len] = '\0';
                 printf("File %s\n", path);
 
+                std::string full_path(path);
+
+                size_t last_slash = full_path.find_last_of("/");
+                std::string filename = (last_slash != std::string::npos) ? full_path.substr(last_slash + 1) : full_path;
+                size_t dot_pos = filename.find_last_of(".");
+                std::string extension = (dot_pos != std::string::npos) ? filename.substr(dot_pos + 1) : "";
+
+                std::time_t timestamp = std::time(nullptr);
+
+                Event event(str, full_path, filename, extension, timestamp);
+
+                log_event(event);
+
                 close(metadata->fd);
             }
 

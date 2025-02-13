@@ -21,7 +21,6 @@
 class EventDetector {
 private:
     int fanotify_fd; ///< File descriptor for fanotify instance
-    int mount_fd;    ///< File descriptor for the mount point
     int ret;         ///< Return value for system calls
     std::queue<Event> event_queue; ///< Queue to store recent events
     size_t max_queue_size = 100; ///< Maximum number of stored events
