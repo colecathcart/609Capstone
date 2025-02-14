@@ -17,8 +17,6 @@ jobs:
     - name: Configure (if needed)
       run: ./configure || true  # Skip if not applicable
     - name: Build
-      run: cd app && make -j$(nproc)
+      run: make -C app -j$(nproc)
     - name: Run Tests
-      run: make test
-    - name: Run Distribution Check
-      run: make distcheck || true  # Optional, depending on project setup
+      run: make -C app test
