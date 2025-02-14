@@ -1,4 +1,6 @@
 **/a.out
 app/app
 **/*.o
+
+app/test_files
 settings.json
