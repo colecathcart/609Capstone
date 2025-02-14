@@ -1,35 +1,46 @@
 #include "EventDetector.h"
+#include <iostream>
+#include <string>
+#include <ctime>
+#include <queue>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/fanotify.h>
+#include <limits.h>
+#include <errno.h>
+
+using namespace std;
 
 // Constructor for EventDetector
 EventDetector::EventDetector() {
-    std::cout << "Initializing EventDetector..." << std::endl;
+    cout << "Initializing EventDetector..." << endl;
     // Initialize fanotify file descriptor
     fanotify_fd = fanotify_init(FAN_CLASS_CONTENT, O_RDONLY);
     if (fanotify_fd == -1) {
         perror("fanotify_init");
         exit(EXIT_FAILURE);
     }
-    std::cout << "fanotify_fd initialized with FD: " << fanotify_fd << std::endl;
+    cout << "fanotify_fd initialized with FD: " << fanotify_fd << endl;
 }
 
 // Destructor for EventDetector
 EventDetector::~EventDetector() {
-    std::cout << "Closing fanotify_fd: " << fanotify_fd << std::endl;
+    cout << "Closing fanotify_fd: " << fanotify_fd << endl;
     // Close the fanotify file descriptor
     close(fanotify_fd);
 }
 
 // Add a watch on the specified path
-void EventDetector::add_watch(const std::string& path) {
-    std::cout << "Adding watch for path: " << path << std::endl;
+void EventDetector::add_watch(const string& path) {
+    cout << "Adding watch for path: " << path << endl;
 
     // Add a fanotify mark on the specified path
-    ret = fanotify_mark(fanotify_fd, FAN_MARK_ADD | FAN_MARK_MOUNT, FAN_ONDIR | FAN_EVENT_ON_CHILD | FAN_CLOSE_WRITE, AT_FDCWD, path.c_str());
+    int ret = fanotify_mark(fanotify_fd, FAN_MARK_ADD | FAN_MARK_MOUNT, FAN_ONDIR | FAN_EVENT_ON_CHILD | FAN_CLOSE_WRITE, AT_FDCWD, path.c_str());
     if (ret == -1) {
         perror("fanotify_mark");
         exit(EXIT_FAILURE);
     } else {
-        std::cout << "Watching " << path << std::endl;
+        cout << "Watching " << path << endl;
     }
 }
 
@@ -121,16 +132,16 @@ void EventDetector::process_events() {
                 path[path_len] = '\0';
                 printf("File %s\n", path);
 
-                std::string full_path(path);
+                string full_path(path);
 
                 // Extract filename and extension from the full path
                 size_t last_slash = full_path.find_last_of("/");
-                std::string filename = (last_slash != std::string::npos) ? full_path.substr(last_slash + 1) : full_path;
+                string filename = (last_slash != string::npos) ? full_path.substr(last_slash + 1) : full_path;
                 size_t dot_pos = filename.find_last_of(".");
-                std::string extension = (dot_pos != std::string::npos) ? filename.substr(dot_pos + 1) : "";
+                string extension = (dot_pos != string::npos) ? filename.substr(dot_pos + 1) : "";
 
                 // Get the current timestamp
-                std::time_t timestamp = std::time(nullptr);
+                time_t timestamp = time(nullptr);
 
                 // Create an Event object
                 Event event(str, full_path, filename, extension, timestamp);
@@ -155,9 +166,9 @@ void EventDetector::log_event(const Event& event) {
 
 // Enqueue the event into the event queue
 void EventDetector::enqueue_event(const Event& event) {
-    std::cout << "Enqueuing event: " << event.get_event_type() << " - " << event.get_filepath() << std::endl;
+    cout << "Enqueuing event: " << event.get_event_type() << " - " << event.get_filepath() << endl;
     if (event_queue.size() >= max_queue_size) {
-        std::cout << "Event queue is full, popping an event." << std::endl;
+        cout << "Event queue is full, popping an event." << endl;
         event_queue.pop();
     }
     event_queue.push(event);
@@ -165,6 +176,6 @@ void EventDetector::enqueue_event(const Event& event) {
 
 // Get the fanotify file descriptor
 int EventDetector::get_fanotify_fd() const {
-    std::cout << "Returning fanotify_fd: " << fanotify_fd << std::endl;
+    cout << "Returning fanotify_fd: " << fanotify_fd << endl;
     return fanotify_fd;
 }
