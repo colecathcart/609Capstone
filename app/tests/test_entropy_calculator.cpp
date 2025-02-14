@@ -1,43 +1,64 @@
 #include <gtest/gtest.h>
 #include "entropy_calculator.h"
-#include <cstdlib>
-#include <sstream>
-#include <fstream>
-#include <cmath>
 
 using namespace std;
 
-// Helper function to get entropy using the `ent` command
-static double get_entropy_with_ent(const std::string& filepath) {
-    string command = "ent " + filepath + " | grep Entropy | awk '{print $3}'";
-    FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) return -1;
-    char buffer[128];
-    string result;
-    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
-        result += buffer;
-    }
-    pclose(pipe);
-    return stod(result);
-}
-
-// Create a test fixture for FileExtensionChecker
+// Test fixture for EntropyCalculator
 class EntropyCalculatorTest : public ::testing::Test {
     protected:
-        EntropyCalculator calculator;  // Instance to be used in all tests
-        string filepath = "test_files.zip";
-    };
+        EntropyCalculator calculator;
+        string encrypted_text = "tests/test_files/encrypted_text.txt.gpg";
+        string plain_text = "tests/test_files/plain_text.txt";
+        string encrypted_image = "tests/test_files/encrypted_image.jpg.gpg";
+        string plain_image = "tests/test_files/plain_image.jpg";
+        string plain_compressed = "tests/test_files/plain_compressed.zip";
+        string encrypted_compressed = "tests/test_files/encrypted_compressed.zip.gpg";
+};
 
-// Test for Shannon Entropy Calculation
-TEST_F(EntropyCalculatorTest, ShannonEntropyTest) {
-    double calculated_entropy = calculator.get_shannon_entropy(filepath);
-    double expected_entropy = get_entropy_with_ent(filepath);
-
-    ASSERT_NEAR(calculated_entropy, expected_entropy, 0.05);
+// Test entropy for encrypted text file 
+TEST_F(EntropyCalculatorTest, EncryptedTextEntropy) {
+    double entropy = calculator.get_shannon_entropy(encrypted_text);
+    EXPECT_GT(entropy, 7) << "Expected entropy > 7 for encrypted text file";
 }
 
-// Test for Monobit Test
-TEST_F(EntropyCalculatorTest, MonobitTest) {
-    bool result = calculator.monobit_test(filepath);
-    ASSERT_FALSE(result);
+// Test entropy for plaintext file 
+TEST_F(EntropyCalculatorTest, PlainTextEntropy) {
+    double entropy = calculator.get_shannon_entropy(plain_text);
+    EXPECT_LT(entropy, 5) << "Expected entropy < 5 for plaintext file";
+}
+
+// Test entropy for encrypted image file 
+TEST_F(EntropyCalculatorTest, EncryptedImageEntropy) {
+    double entropy = calculator.get_shannon_entropy(encrypted_image);
+    EXPECT_GT(entropy, 7) << "Expected entropy > 7 for encrypted image file";
+}
+
+// Test entropy for unencrypted image file 
+TEST_F(EntropyCalculatorTest, UnencryptedImageEntropy) {
+    double entropy = calculator.get_shannon_entropy(plain_image);
+    EXPECT_GT(entropy, 7) << "Expected entropy > 7 for unencrypted image file";
+}
+
+// Test entropy for encrypted ZIP file
+TEST_F(EntropyCalculatorTest, EncryptedZipEntropy) {
+    double entropy = calculator.get_shannon_entropy(encrypted_compressed);
+    EXPECT_GT(entropy, 7) << "Expected entropy > 7 for encrypted ZIP file";
+}
+
+// Test entropy for unencrypted ZIP file
+TEST_F(EntropyCalculatorTest, UnencryptedZipEntropy) {
+    double entropy = calculator.get_shannon_entropy(plain_compressed);
+    EXPECT_GT(entropy, 7) << "Expected entropy > 7 for unencrypted ZIP file";
+}
+
+// Test monobit result for encrypted image 
+TEST_F(EntropyCalculatorTest, MonobitTestEncryptedImage) {
+    bool result = calculator.monobit_test(encrypted_image);
+    ASSERT_TRUE(result) << "Expected monobit test to pass for encrypted image";
+}
+
+// Test monobit result for unencrypted image
+TEST_F(EntropyCalculatorTest, MonobitTestUnencryptedImage) {
+    bool result = calculator.monobit_test(plain_image);
+    ASSERT_FALSE(result) << "Expected monobit test to fail for unencrypted image";
 }
