@@ -1,4 +1,4 @@
-#include "Event.h"
+#include "event.h"
 
 Event::Event(const std::string& type, const std::string& path, 
         const std::string& name, const std::string& ext, std::time_t timestamp)

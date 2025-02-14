@@ -1,4 +1,4 @@
-#include "EventDetector.h"
+#include "event_detector.h"
 #include <iostream>
 #include <string>
 #include <ctime>

@@ -13,7 +13,7 @@
 #include <sys/fanotify.h>
 #include <unistd.h>
 #include <linux/limits.h>
-#include "Event.h"
+#include "event.h"
 
 /**
  * @brief Class to monitor file system events using fanotify.
