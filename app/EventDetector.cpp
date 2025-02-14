@@ -87,15 +87,13 @@ void EventDetector::process_events() {
                 case FAN_MOVE_SELF:
                     str = "MOVE SELF";
                     break;
-                case FAN_MODIFY:
-                    str = "MODIFY";
+                case FAN_CLOSE_WRITE:
+                    str = "FAN_CLOSE_WRITE";
                     break;
                 default:
                     str = "?";
                     break;
             }
-
-            printf("%s\n", str);
 
             if (metadata->fd >= 0) {
                 // Handle permission events
