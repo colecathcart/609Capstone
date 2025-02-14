@@ -20,6 +20,7 @@ event_detector.o: src/event_detector.cpp
 
 test: tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp 
 	g++ -Wall -Iinclude tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp -lgtest -pthread -o test_app
+	./test_app
 
 remove:
 	rm -f *.o app test_app
