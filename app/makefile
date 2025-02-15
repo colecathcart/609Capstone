@@ -18,7 +18,11 @@ event.o: src/event.cpp
 event_detector.o: src/event_detector.cpp
 	g++ -Wall -Iinclude -c src/event_detector.cpp
 
-remove:
-	rm -f *.o app
+test: tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp 
+	g++ -Wall -Iinclude tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp -lgtest -pthread -o test_app
+	./test_app
 
-clean: all remove
+remove:
+	rm -f *.o app test_app
+
+clean: remove
