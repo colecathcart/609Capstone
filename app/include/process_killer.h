@@ -14,22 +14,12 @@ using namespace std;
  */
 class ProcessKiller {
 public:
-    /**
-     * @brief Name of the process.
-     */
-    string process_name;
 
     /**
-     * @brief ID of the process.
-     */
-    int process_id;
-
-    /**
-     * @brief Constructs a ProcessKiller instance with a process name and ID.
-     * @param name Name of the process.
+     * @brief Constructs a ProcessKiller instance with a process ID.
      * @param pid ID of the process.
      */
-    ProcessKiller(const string& name, int pid);
+    ProcessKiller(int pid);
 
     /**
      * @brief Kills the process and all its child processes.
@@ -37,13 +27,19 @@ public:
      */
     bool killFamily();
 
-private:
     /**
      * @brief Deletes files associated with the process.
      * @param file_paths A list of file paths to be deleted.
      * @return True if all files were successfully deleted, false otherwise.
      */
     bool deleteFiles(const vector<string>& file_paths);
+
+private:
+
+    /**
+     * @brief ID of the process.
+     */
+    int process_id;
 };
 
 #endif 
