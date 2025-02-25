@@ -8,6 +8,7 @@
 #include <sys/fanotify.h>
 #include <limits.h>
 #include <errno.h>
+#include <sstream>
 
 using namespace std;
 
@@ -42,6 +43,18 @@ void EventDetector::add_watch(const string& path) {
     } else {
         cout << "Watching " << path << endl;
     }
+}
+
+bool EventDetector::is_hidden_path(const string& path) {
+    stringstream ss(path);
+    string segmemnt;
+
+    while (getline(ss, segmemnt, '/')) {
+        if (segmemnt.length() > 0 && segmemnt[0] == '.') {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Process events from the fanotify file descriptor

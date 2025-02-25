@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
     cout << "Is file an image?: " << is_image << endl;
 
     EventDetector detector;
-    detector.add_watch("/tmp");
+    detector.add_watch("/home");
 
     struct pollfd pfd;
     pfd.fd = detector.get_fanotify_fd();
