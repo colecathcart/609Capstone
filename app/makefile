@@ -25,4 +25,9 @@ test: tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_exte
 remove:
 	rm -f *.o app test_app
 
+without_objects:
+	rm -f *.o
+
+no_obj: all without_objects
+
 clean: remove
