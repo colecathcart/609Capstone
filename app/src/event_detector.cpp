@@ -88,38 +88,56 @@ void EventDetector::process_events() {
                 exit(EXIT_FAILURE);
             }
 
-            // Determine the type of event
-            switch (metadata->mask) {
-                case FAN_ATTRIB:
-                    str = "ATTRIB";
-                    break;
-                case FAN_CREATE:
-                    str = "CREATE";
-                    break;
-                case FAN_DELETE:
-                    str = "DELETE";
-                    break;
-                case FAN_DELETE_SELF:
-                    str = "DELETE SELF";
-                    break;
-                case FAN_MOVED_FROM:
-                    str = "MOVED FROM";
-                    break;
-                case FAN_MOVED_TO:
-                    str = "MOVED TO";
-                    break;
-                case FAN_MOVE_SELF:
-                    str = "MOVE SELF";
-                    break;
-                case FAN_CLOSE_WRITE:
-                    str = "FAN_CLOSE_WRITE";
-                    break;
-                default:
-                    str = "?";
-                    break;
-            }
-
             if (metadata->fd >= 0) {
+                // Get the path of the file associated with the event
+                sprintf(procfd_path, "/proc/self/fd/%d", metadata->fd);
+                path_len = readlink(procfd_path, path, sizeof(path) - 1);
+                if (path_len == -1) {
+                    perror("readlink");
+                    exit(EXIT_FAILURE);
+                }
+
+                path[path_len] = '\0';
+                string full_path(path);
+
+                // **Skip hidden files and directories BEFORE checking event type**
+                if (is_hidden_path(full_path)) {
+                    close(metadata->fd);
+                    metadata = FAN_EVENT_NEXT(metadata, len);
+                    continue;
+                }
+
+                // Determine the type of event
+                switch (metadata->mask) {
+                    case FAN_ATTRIB:
+                        str = "ATTRIB";
+                        break;
+                    case FAN_CREATE:
+                        str = "CREATE";
+                        break;
+                    case FAN_DELETE:
+                        str = "DELETE";
+                        break;
+                    case FAN_DELETE_SELF:
+                        str = "DELETE SELF";
+                        break;
+                    case FAN_MOVED_FROM:
+                        str = "MOVED FROM";
+                        break;
+                    case FAN_MOVED_TO:
+                        str = "MOVED TO";
+                        break;
+                    case FAN_MOVE_SELF:
+                        str = "MOVE SELF";
+                        break;
+                    case FAN_CLOSE_WRITE:
+                        str = "FAN_CLOSE_WRITE";
+                        break;
+                    default:
+                        str = "?";
+                        break;
+                }
+
                 // Handle permission events
                 if (metadata->mask & FAN_OPEN_PERM) {
                     printf("FAN_OPEN_PERM: ");
@@ -134,18 +152,7 @@ void EventDetector::process_events() {
                     printf("FAN_CLOSE_WRITE: ");
                 }
 
-                // Get the path of the file associated with the event
-                sprintf(procfd_path, "/proc/self/fd/%d", metadata->fd);
-                path_len = readlink(procfd_path, path, sizeof(path) - 1);
-                if (path_len == -1) {
-                    perror("readlink");
-                    exit(EXIT_FAILURE);
-                }
-
-                path[path_len] = '\0';
                 printf("File %s\n", path);
-
-                string full_path(path);
 
                 // Extract filename and extension from the full path
                 size_t last_slash = full_path.find_last_of("/");
