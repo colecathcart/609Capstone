@@ -65,6 +65,13 @@ public:
      */
 
     int get_fanotify_fd() const;
+
+    /**
+     * @brief Checks if the specified path is hidden.
+     * @param path The path to check.
+     * @return True if the path is hidden, false otherwise.
+     */
+    bool is_hidden_path(const std::string &path);
 };
 
 #endif // EVENT_DETECTOR_H
