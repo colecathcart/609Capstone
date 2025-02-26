@@ -164,7 +164,7 @@ void EventDetector::process_events() {
                 time_t timestamp = time(nullptr);
 
                 // Create an Event object
-                Event event(str, full_path, filename, extension, timestamp);
+                Event event(str, full_path, filename, extension, timestamp, metadata->pid);
 
                 // Log the event
                 log_event(event);
