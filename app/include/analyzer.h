@@ -35,7 +35,7 @@ class Analyzer
         /**
          * @brief A map holding identified suspicious processes
          */
-        unordered_map<string, time_t> suspicious_procs;
+        unordered_map<pid_t, time_t> suspicious_procs;
 
         /**
          * @brief An instance of EntropyCalculator for determining encryption
@@ -46,6 +46,11 @@ class Analyzer
          * @brief An instance of FileExtensionChecker for determining file type
          */
         FileExtensionChecker file_checker;
+
+        /**
+         * @brief Helper function to update suspicious_procs and take action if required
+         */
+        void update_watch(pid_t pid, time_t timestamp);
 };
 
 #endif

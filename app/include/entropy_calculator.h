@@ -45,6 +45,11 @@ class EntropyCalculator
          * @brief The size of buffer (in Bytes) to be read from a file at a time
          */
         const size_t buffer_size;
+
+        /**
+         * @brief Helper function to ignore small files (< 1 KB)
+         */
+        bool is_small_file(const string& filepath) const;
 };
 
 #endif

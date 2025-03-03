@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <linux/limits.h>
 #include "event.h"
+#include "analyzer.h"
 
 /**
  * @brief Class to monitor file system events using fanotify.
@@ -24,6 +25,7 @@ private:
     int ret;         ///< Return value for system calls
     std::queue<Event> event_queue; ///< Queue to store recent events
     size_t max_queue_size = 100; ///< Maximum number of stored events
+    Analyzer analyzer; ///< For passing events to
 
 public:
     /**
