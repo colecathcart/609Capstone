@@ -13,7 +13,7 @@
 using namespace std;
 
 // Constructor for EventDetector
-EventDetector::EventDetector() {
+EventDetector::EventDetector(): analyzer(Analyzer()) {
     cout << "Initializing EventDetector..." << endl;
     // Initialize fanotify file descriptor
     fanotify_fd = fanotify_init(FAN_CLASS_CONTENT, O_RDONLY);
@@ -168,6 +168,10 @@ void EventDetector::process_events() {
 
                 // Log the event
                 log_event(event);
+
+                // Call analyzer
+
+                analyzer.analyze(event);
 
                 // Close the file descriptor associated with the event
                 close(metadata->fd);
