@@ -28,11 +28,10 @@ public:
     bool killFamily();
 
     /**
-     * @brief Deletes files associated with the process.
-     * @param file_paths A list of file paths to be deleted.
-     * @return True if all files were successfully deleted, false otherwise.
+     * @brief Remoes the ransomware executable.
+     * @return True if executable was successfuly deleted, false otherwise.
      */
-    bool deleteFiles(const vector<string>& file_paths);
+    bool removeExecutable();
 
 private:
 
