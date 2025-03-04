@@ -17,7 +17,29 @@ EntropyCalculator::EntropyCalculator(int buff_size_kb): buffer_size(buff_size_kb
 
 }
 
+bool EntropyCalculator::is_small_file(const string& filepath) const {
+    ifstream file(filepath, ios::binary);
+
+    if (!file.is_open()) {
+        cerr << "Error opening file." << endl;
+        return -1;
+    }
+
+    file.seekg(0, ios::end);
+    if(file.tellg() < 1024) {
+        file.close();
+        return true;
+    }
+    file.close();
+    return false;
+}
+
 double EntropyCalculator::get_shannon_entropy(const string& filepath) const {
+    
+    if(is_small_file(filepath)) {
+        return 0;
+    }
+    
     ifstream file(filepath, ios::binary);
     
     if (!file.is_open()) {
@@ -47,6 +69,11 @@ double EntropyCalculator::get_shannon_entropy(const string& filepath) const {
 }
 
 bool EntropyCalculator::monobit_test(const string& filepath) const {
+
+     if(is_small_file(filepath)) {
+        return false;
+    }
+
     ifstream file(filepath, ios::binary);
 
     if(!file) {
