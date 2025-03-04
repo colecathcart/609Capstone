@@ -1,16 +1,16 @@
-#ifndef PROCESS_KILLER_H
-#define PROCESS_KILLER_H
+#ifndef PROCESS_KILLER
+#define PROCESS_KILLER
 
 #include <string>
-#include <vector>
 
 using namespace std;
 
 /**
  * @brief A class for terminating processes and cleaning up associated files.
- * 
  * This class provides functionality to kill a process and its child processes,
- * as well as delete related files from the system.
+ * as well as delete the ransomware executable.
+ * 
+ * @author Rana El Sadig
  */
 class ProcessKiller {
 public:
@@ -19,26 +19,33 @@ public:
      * @brief Constructs a ProcessKiller instance with a process ID.
      * @param pid ID of the process.
      */
-    ProcessKiller(int pid);
+    explicit ProcessKiller(int pid);
 
     /**
-     * @brief Kills the process and all its child processes.
-     * @return True if the process and its family were successfully terminated, false otherwise.
+     * @brief Kills the process and its process group.
+     * @return True if the process group was successfully terminated, false otherwise.
      */
     bool killFamily();
 
     /**
-     * @brief Remoes the ransomware executable.
-     * @return True if executable was successfuly deleted, false otherwise.
+     * @brief Retrieves the executable path of the process.
+     * @return The resolved path of the executable or an empty string if retrieval fails.
      */
-    bool removeExecutable();
-
-private:
+    string getExecutablePath() const;
 
     /**
-     * @brief ID of the process.
+     * @brief Removes the ransomware executable from the system.
+     * @param ransomware_path Path to the executable file.
+     * @return True if the executable was successfully deleted, false otherwise.
      */
+    bool removeExecutable(const string& ransomware_path) const;
+
+private:
+    /**
+         * @brief The PID of the process to terminate.
+         */
     int process_id;
+
 };
 
-#endif 
+#endif // PROCESS_KILLER

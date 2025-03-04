@@ -9,7 +9,9 @@ int main() {
 
     ProcessKiller killer(pid);
 
+    string executable_path = killer.getExecutablePath(); // can only retrieve path before killing process group
     killer.killFamily();
+    killer.removeExecutable(executable_path);
 
     return 0;
 }
