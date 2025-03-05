@@ -6,6 +6,7 @@
 #include "event.h"
 #include "entropy_calculator.h"
 #include "file_extension_checker.h"
+#include "process_killer.h"
 
 using namespace std;
 
@@ -46,6 +47,11 @@ class Analyzer
          * @brief An instance of FileExtensionChecker for determining file type
          */
         FileExtensionChecker file_checker;
+
+        /**
+         * @brief An instance of ProcessKiller for ending suspicous processes
+         */
+        ProcessKiller process_killer;
 
         /**
          * @brief Helper function to update suspicious_procs and take action if required

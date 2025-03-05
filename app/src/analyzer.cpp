@@ -5,7 +5,7 @@
 #include "file_extension_checker.h"
 
 Analyzer::Analyzer()
-    : calculator(EntropyCalculator()), file_checker(FileExtensionChecker())
+    : calculator(EntropyCalculator()), file_checker(FileExtensionChecker()), process_killer(ProcessKiller())
 {
 }
 
@@ -16,9 +16,10 @@ void Analyzer::update_watch(pid_t pid, time_t timestamp)
 
         // Check if last hit was less than an hour ago
         if(abs(timestamp - last_hit) < 3600) {
-            // Replace with call to ProcessKiler
             cout << "Process " + to_string(pid) + " is too suspicious, flagging for removal." << endl;
-            
+            string exec_path = process_killer.getExecutablePath(pid);
+            process_killer.killFamily(pid);
+            process_killer.removeExecutable(exec_path);
             suspicious_procs.erase(pid);
         }
     } else {
@@ -29,8 +30,10 @@ void Analyzer::update_watch(pid_t pid, time_t timestamp)
 void Analyzer::analyze(Event& event)
 {
     if(file_checker.is_suspicious(event.get_filename())) {
-        // replace with call to ProcessKiller
         cout << "Process " + to_string(event.get_pid()) + " is too suspicious, flagging for removal." << endl;
+        string exec_path = process_killer.getExecutablePath(event.get_pid());
+        process_killer.killFamily(event.get_pid());
+        process_killer.removeExecutable(exec_path);
         return;
     }
 
