@@ -1,0 +1,60 @@
+#include "../include/process_killer.h"
+#include <filesystem>
+#include <iostream>
+#include <unistd.h>
+#include <signal.h>
+#include <limits.h>
+
+ProcessKiller::ProcessKiller(int pid) : process_id(pid) {}
+
+string ProcessKiller::getExecutablePath() const {
+    string exe_path = "/proc/" + to_string(process_id) + "/exe";
+    char resolved_path[PATH_MAX];
+    ssize_t len = readlink(exe_path.c_str(), resolved_path, sizeof(resolved_path) - 1);
+
+    if (len != -1) {
+        resolved_path[len] = '\0'; // Null-terminate the string
+        return string(resolved_path);
+    } else {
+        cerr << "Failed to resolve ransomware executable path for PID: " << process_id << endl;
+        return "";
+    }
+}
+
+bool ProcessKiller::killFamily() {
+    // Get the PGID (process group ID) of the given PID
+    pid_t pgid = getpgid(process_id);
+    if (pgid == -1) {
+        cerr << "Failed to get PGID for PID: " << process_id << endl;
+        return false;
+    }
+    
+    // Kill the entire process group
+    if (kill(-pgid, SIGKILL) == 0) {
+        cout << "Successfully killed process group with PGID: " << pgid << endl;
+        return true;
+    } else {
+        cerr << "Failed to kill process group with PGID: " << pgid << endl;
+        return false;
+    }
+}
+
+bool ProcessKiller::removeExecutable(const string& ransomware_path) const {
+    if (ransomware_path.empty()) {
+        cerr << "Executable path is empty. Skipping deletion." << endl;
+        return false;
+    }
+
+    if (filesystem::exists(ransomware_path)) {
+        if (filesystem::remove(ransomware_path)) {
+            cout << "Successfully deleted ransomware executable: " << ransomware_path << endl;
+            return true;
+        } else {
+            cerr << "Failed to delete ransomware executable: " << ransomware_path << endl;
+            return false;
+        }
+    } else {
+        cerr << "Ransomware executable not found: " << ransomware_path << endl;
+        return false;
+    }
+}
