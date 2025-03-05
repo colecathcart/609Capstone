@@ -63,6 +63,7 @@ void EventDetector::process_events() {
     struct fanotify_event_metadata buf[200];
     ssize_t len;
     char path[PATH_MAX];
+    char last_path[PATH_MAX];
     ssize_t path_len;
     char procfd_path[PATH_MAX];
     // struct fanotify_response response;
@@ -99,6 +100,13 @@ void EventDetector::process_events() {
 
                 path[path_len] = '\0';
                 string full_path(path);
+
+                // Check if this is the same event as the last one
+                if (strcmp(last_path, full_path.c_str()) == 0) {
+                    close(metadata->fd);
+                    metadata = FAN_EVENT_NEXT(metadata, len);
+                    continue;
+                }
 
                 // **Skip hidden files and directories BEFORE checking event type**
                 if (is_hidden_path(full_path)) {
@@ -169,6 +177,9 @@ void EventDetector::process_events() {
 
                 // Log the event
                 log_event(event);
+
+                // Save last path
+                strcpy(last_path, full_path.c_str());
 
                 // Call analyzer
 
