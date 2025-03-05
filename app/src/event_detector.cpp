@@ -47,12 +47,20 @@ void EventDetector::add_watch(const string& path) {
 
 bool EventDetector::is_hidden_path(const string& path) {
     stringstream ss(path);
-    string segmemnt;
+    string segment;
 
-    while (getline(ss, segmemnt, '/')) {
-        if (segmemnt.length() > 0 && segmemnt[0] == '.') {
+    while (getline(ss, segment, '/')) {
+        if (segment.length() > 0 && segment[0] == '.') {
             return true;
         }
+    }
+    return false;
+}
+
+bool EventDetector::is_no_concern_path(const std::string &path) {
+    // Check if the path contains /tmp/ or /var/spool/
+    if (path.find("/tmp/") != string::npos || path.find("/var/spool/") != string::npos) {
+        return true;
     }
     return false;
 }
@@ -109,7 +117,7 @@ void EventDetector::process_events() {
                 }
 
                 // **Skip hidden files and directories BEFORE checking event type**
-                if (is_hidden_path(full_path)) {
+                if (is_hidden_path(full_path) || is_no_concern_path(full_path)) {
                     close(metadata->fd);
                     metadata = FAN_EVENT_NEXT(metadata, len);
                     continue;
