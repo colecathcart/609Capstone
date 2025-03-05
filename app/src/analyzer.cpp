@@ -19,7 +19,7 @@ void Analyzer::update_watch(pid_t pid, time_t timestamp)
             cout << "Process " + to_string(pid) + " is too suspicious, flagging for removal." << endl;
             string exec_path = process_killer.getExecutablePath(pid);
             process_killer.killFamily(pid);
-            process_killer.removeExecutable(exec_path);
+            //process_killer.removeExecutable(exec_path);
             suspicious_procs.erase(pid);
         }
     } else {
@@ -33,7 +33,7 @@ void Analyzer::analyze(Event& event)
         cout << "Process " + to_string(event.get_pid()) + " is too suspicious, flagging for removal." << endl;
         string exec_path = process_killer.getExecutablePath(event.get_pid());
         process_killer.killFamily(event.get_pid());
-        process_killer.removeExecutable(exec_path);
+        //process_killer.removeExecutable(exec_path);
         return;
     }
 
