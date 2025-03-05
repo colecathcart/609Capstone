@@ -44,7 +44,7 @@ def decrypt_folder(folder_path, key):
 
 # Main function
 if __name__ == "__main__":
-    folder_path = "./encryption_zone/files2encrypt"
+    folder_path = "./files2encrypt"
     
     # You need to enter the same key used for encryption
     key_hex = input("Enter the encryption key (hex format): ")

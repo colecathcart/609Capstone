@@ -60,7 +60,7 @@ def encrypt_folder(folder_path, key):
 
 # Main function
 if __name__ == "__main__":
-    folder_path = "./encryption_zone/files2encrypt"  # Always use the "files2encrypt" folder
+    folder_path = "./files2encrypt"  # Always use the "files2encrypt" folder
     key = generate_key()
     encrypt_folder(folder_path, key)
     print("All files encrypted.")
