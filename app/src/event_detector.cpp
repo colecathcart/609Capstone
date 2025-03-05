@@ -36,7 +36,7 @@ void EventDetector::add_watch(const string& path) {
     cout << "Adding watch for path: " << path << endl;
 
     // Add a fanotify mark on the specified path
-    int ret = fanotify_mark(fanotify_fd, FAN_MARK_ADD | FAN_MARK_MOUNT, FAN_ONDIR | FAN_EVENT_ON_CHILD | FAN_CLOSE_WRITE, AT_FDCWD, path.c_str());
+    int ret = fanotify_mark(fanotify_fd, FAN_MARK_ADD | FAN_MARK_MOUNT, FAN_CLOSE_WRITE, AT_FDCWD, path.c_str());
     if (ret == -1) {
         perror("fanotify_mark");
         exit(EXIT_FAILURE);
@@ -65,7 +65,7 @@ void EventDetector::process_events() {
     char path[PATH_MAX];
     ssize_t path_len;
     char procfd_path[PATH_MAX];
-    struct fanotify_response response;
+    // struct fanotify_response response;
     const char *str;
 
     for (;;) {
@@ -138,7 +138,8 @@ void EventDetector::process_events() {
                         break;
                 }
 
-                // Handle permission events
+                // Can likely remove this code block in final version
+                /* Handle permission events
                 if (metadata->mask & FAN_OPEN_PERM) {
                     printf("FAN_OPEN_PERM: ");
 
@@ -152,7 +153,7 @@ void EventDetector::process_events() {
                     printf("FAN_CLOSE_WRITE: ");
                 }
 
-                printf("File %s\n", path);
+                printf("File %s\n", path); */
 
                 // Extract filename and extension from the full path
                 size_t last_slash = full_path.find_last_of("/");
