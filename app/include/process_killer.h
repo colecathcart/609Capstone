@@ -16,22 +16,21 @@ class ProcessKiller {
 public:
 
     /**
-     * @brief Constructs a ProcessKiller instance with a process ID.
-     * @param pid ID of the process.
+     * @brief Constructs a ProcessKiller instance 
      */
-    explicit ProcessKiller(int pid);
+    ProcessKiller();
 
     /**
      * @brief Kills the process and its process group.
      * @return True if the process group was successfully terminated, false otherwise.
      */
-    bool killFamily();
+    bool killFamily(pid_t pid);
 
     /**
      * @brief Retrieves the executable path of the process.
      * @return The resolved path of the executable or an empty string if retrieval fails.
      */
-    string getExecutablePath() const;
+    string getExecutablePath(pid_t pid) const;
 
     /**
      * @brief Removes the ransomware executable from the system.
@@ -39,12 +38,6 @@ public:
      * @return True if the executable was successfully deleted, false otherwise.
      */
     bool removeExecutable(const string& ransomware_path) const;
-
-private:
-    /**
-         * @brief The PID of the process to terminate.
-         */
-    int process_id;
 
 };
 

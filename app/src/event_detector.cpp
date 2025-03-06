@@ -36,7 +36,7 @@ void EventDetector::add_watch(const string& path) {
     cout << "Adding watch for path: " << path << endl;
 
     // Add a fanotify mark on the specified path
-    int ret = fanotify_mark(fanotify_fd, FAN_MARK_ADD | FAN_MARK_MOUNT, FAN_ONDIR | FAN_EVENT_ON_CHILD | FAN_CLOSE_WRITE, AT_FDCWD, path.c_str());
+    int ret = fanotify_mark(fanotify_fd, FAN_MARK_ADD | FAN_MARK_MOUNT, FAN_CLOSE_WRITE, AT_FDCWD, path.c_str());
     if (ret == -1) {
         perror("fanotify_mark");
         exit(EXIT_FAILURE);
@@ -47,12 +47,20 @@ void EventDetector::add_watch(const string& path) {
 
 bool EventDetector::is_hidden_path(const string& path) {
     stringstream ss(path);
-    string segmemnt;
+    string segment;
 
-    while (getline(ss, segmemnt, '/')) {
-        if (segmemnt.length() > 0 && segmemnt[0] == '.') {
+    while (getline(ss, segment, '/')) {
+        if (segment.length() > 0 && segment[0] == '.') {
             return true;
         }
+    }
+    return false;
+}
+
+bool EventDetector::is_no_concern_path(const std::string &path) {
+    // Check if the path contains /tmp/ or /var/spool/
+    if (path.find("/tmp/") != string::npos || path.find("/var/spool/") != string::npos) {
+        return true;
     }
     return false;
 }
@@ -63,9 +71,10 @@ void EventDetector::process_events() {
     struct fanotify_event_metadata buf[200];
     ssize_t len;
     char path[PATH_MAX];
+    char last_path[PATH_MAX];
     ssize_t path_len;
     char procfd_path[PATH_MAX];
-    struct fanotify_response response;
+    // struct fanotify_response response;
     const char *str;
 
     for (;;) {
@@ -100,8 +109,15 @@ void EventDetector::process_events() {
                 path[path_len] = '\0';
                 string full_path(path);
 
+                // Check if this is the same event as the last one
+                if (strcmp(last_path, full_path.c_str()) == 0) {
+                    close(metadata->fd);
+                    metadata = FAN_EVENT_NEXT(metadata, len);
+                    continue;
+                }
+
                 // **Skip hidden files and directories BEFORE checking event type**
-                if (is_hidden_path(full_path)) {
+                if (is_hidden_path(full_path) || is_no_concern_path(full_path)) {
                     close(metadata->fd);
                     metadata = FAN_EVENT_NEXT(metadata, len);
                     continue;
@@ -138,7 +154,8 @@ void EventDetector::process_events() {
                         break;
                 }
 
-                // Handle permission events
+                // Can likely remove this code block in final version
+                /* Handle permission events
                 if (metadata->mask & FAN_OPEN_PERM) {
                     printf("FAN_OPEN_PERM: ");
 
@@ -152,7 +169,7 @@ void EventDetector::process_events() {
                     printf("FAN_CLOSE_WRITE: ");
                 }
 
-                printf("File %s\n", path);
+                printf("File %s\n", path); */
 
                 // Extract filename and extension from the full path
                 size_t last_slash = full_path.find_last_of("/");
@@ -168,6 +185,9 @@ void EventDetector::process_events() {
 
                 // Log the event
                 log_event(event);
+
+                // Save last path
+                strcpy(last_path, full_path.c_str());
 
                 // Call analyzer
 

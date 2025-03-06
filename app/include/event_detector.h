@@ -74,6 +74,13 @@ public:
      * @return True if the path is hidden, false otherwise.
      */
     bool is_hidden_path(const std::string &path);
+
+    /**
+     * @brief Checks if the specified path is not a concern, like /tmp or /var/spool/.
+     * @param path The path to check.
+     * @return True if the path is not a concern, false otherwise.
+     */
+    bool is_no_concern_path(const std::string &path);
 };
 
 #endif // EVENT_DETECTOR_H

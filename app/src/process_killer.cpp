@@ -5,10 +5,12 @@
 #include <signal.h>
 #include <limits.h>
 
-ProcessKiller::ProcessKiller(int pid) : process_id(pid) {}
+ProcessKiller::ProcessKiller() {
 
-string ProcessKiller::getExecutablePath() const {
-    string exe_path = "/proc/" + to_string(process_id) + "/exe";
+}
+
+string ProcessKiller::getExecutablePath(pid_t pid) const {
+    string exe_path = "/proc/" + to_string(pid) + "/exe";
     char resolved_path[PATH_MAX];
     ssize_t len = readlink(exe_path.c_str(), resolved_path, sizeof(resolved_path) - 1);
 
@@ -16,16 +18,16 @@ string ProcessKiller::getExecutablePath() const {
         resolved_path[len] = '\0'; // Null-terminate the string
         return string(resolved_path);
     } else {
-        cerr << "Failed to resolve ransomware executable path for PID: " << process_id << endl;
+        cerr << "Failed to resolve ransomware executable path for PID: " << pid << endl;
         return "";
     }
 }
 
-bool ProcessKiller::killFamily() {
+bool ProcessKiller::killFamily(pid_t pid) {
     // Get the PGID (process group ID) of the given PID
-    pid_t pgid = getpgid(process_id);
+    pid_t pgid = getpgid(pid);
     if (pgid == -1) {
-        cerr << "Failed to get PGID for PID: " << process_id << endl;
+        cerr << "Failed to get PGID for PID: " << pid << endl;
         return false;
     }
     
