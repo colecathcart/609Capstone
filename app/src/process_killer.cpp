@@ -54,7 +54,7 @@ bool ProcessKiller::removeExecutable(const string& ransomware_path) const {
 
     // Check if the user clicked "Yes" (Zenity returns 0 for "Yes", 1 for "No")
     if (result != 0) {
-        cout << "User canceled deletion." << endl;
+        cout << "User canceled executable deletion." << endl;
         return false;
     }
 
