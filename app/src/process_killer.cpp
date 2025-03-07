@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <limits.h>
+#include <cstdlib> // For system()
 
 ProcessKiller::ProcessKiller() {
 
@@ -44,6 +45,16 @@ bool ProcessKiller::killFamily(pid_t pid) {
 bool ProcessKiller::removeExecutable(const string& ransomware_path) const {
     if (ransomware_path.empty()) {
         cerr << "Executable path is empty. Skipping deletion." << endl;
+        return false;
+    }
+
+    // Pop-up confirmation dialog using Zenity
+    string command = "zenity --question --text='Do you want to delete the ransomware executable saved in " + ransomware_path + "?' --title='Confirm Deletion'";
+    int result = system(command.c_str());
+
+    // Check if the user clicked "Yes" (Zenity returns 0 for "Yes", 1 for "No")
+    if (result != 0) {
+        cout << "User canceled executable deletion." << endl;
         return false;
     }
 
