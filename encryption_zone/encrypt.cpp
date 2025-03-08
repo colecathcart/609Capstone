@@ -65,7 +65,8 @@ void encrypt_file(const string& file_path, const vector<unsigned char>& key) {
         encrypted_file.write(reinterpret_cast<char*>(encrypted_data.data()), out_len1 + out_len2);
         encrypted_file.close();
 
-        remove(file_path.c_str());
+        // Delete the original file (be careful!!!)
+        //remove(file_path.c_str());
 
         cout << "Encrypted: " << file_path << endl;
     } catch (const exception& e) {
