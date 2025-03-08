@@ -3,4 +3,5 @@ app/app
 **/*.o
 
 app/test_files
+app/log.txt
 settings.json

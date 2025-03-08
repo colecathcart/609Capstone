@@ -12,6 +12,6 @@ std::time_t Event::get_time() const { return time; }
 pid_t Event::get_pid() const { return pid; }
 
 void Event::print() const {
-    std::cout << "Event Type: " << event_type << ", File: " << filepath 
-                << ", Timestamp: " << time << ", PID: " << pid << std::endl;
+    std::cout << "Event Type: " << event_type << "\n\tFile: " << filename 
+                << "\n\tTimestamp: " << time << ",\n\tPID: " << pid << std::endl;
 }

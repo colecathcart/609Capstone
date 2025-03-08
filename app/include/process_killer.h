@@ -2,6 +2,7 @@
 #define PROCESS_KILLER
 
 #include <string>
+#include "logger.h"
 
 using namespace std;
 
@@ -13,6 +14,11 @@ using namespace std;
  * @author Rana El Sadig
  */
 class ProcessKiller {
+private:
+    /**
+     * @brief Singleton logger instance
+     */
+    Logger* logger;
 public:
 
     /**

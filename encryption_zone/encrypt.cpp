@@ -60,10 +60,12 @@ void encrypt_file(const string& file_path, const vector<unsigned char>& key) {
         EVP_CIPHER_CTX_free(ctx);
 
         // Write the encrypted data back to the file (overwrite the original or save as new)
-        ofstream encrypted_file(file_path + ".enc", ios::binary);
+        ofstream encrypted_file(file_path + ".en", ios::binary);
         encrypted_file.write(reinterpret_cast<char*>(iv.data()), iv.size()); // Prepend the IV to the encrypted file
         encrypted_file.write(reinterpret_cast<char*>(encrypted_data.data()), out_len1 + out_len2);
         encrypted_file.close();
+
+        remove(file_path.c_str());
 
         cout << "Encrypted: " << file_path << endl;
     } catch (const exception& e) {

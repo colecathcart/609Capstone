@@ -1,4 +1,5 @@
 #include "../include/process_killer.h"
+#include "logger.h"
 #include <filesystem>
 #include <iostream>
 #include <unistd.h>
@@ -7,7 +8,7 @@
 #include <cstdlib> // For system()
 
 ProcessKiller::ProcessKiller() {
-
+    logger = Logger::getInstance();
 }
 
 string ProcessKiller::getExecutablePath(pid_t pid) const {
@@ -49,7 +50,7 @@ bool ProcessKiller::removeExecutable(const string& ransomware_path) const {
     }
 
     // Pop-up confirmation dialog using Zenity
-    string command = "zenity --question --text='Do you want to delete the ransomware executable saved in " + ransomware_path + "?' --title='Confirm Deletion'";
+    string command = "zenity --question --text='A potentially malicious executable was found at " + ransomware_path + ". Do you want to delete it?' --title='Suspicious File Detected' 2>/dev/null";
     int result = system(command.c_str());
 
     // Check if the user clicked "Yes" (Zenity returns 0 for "Yes", 1 for "No")
