@@ -19,6 +19,13 @@ private:
      * @brief Singleton logger instance
      */
     Logger* logger;
+
+protected:
+    /**
+     * @brief Prompts the user before deleting the ransomware executable.
+     * @return True if the user agrees to remove the executable, false otherwise.
+     */
+    virtual bool promptUserForExecutableRemoval(const string& ransomware_path) const;
 public:
 
     /**
