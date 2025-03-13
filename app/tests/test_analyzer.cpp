@@ -12,7 +12,7 @@ protected:
     Analyzer analyzer;
 };
 
-// Test suspicious file extension triggers removal
+// Test whether suspicious file extension triggers removal
 TEST_F(AnalyzerTest, SuspiciousFileExtensionTriggersRemoval) {
     time_t now = time(nullptr);
 
@@ -72,7 +72,7 @@ TEST_F(AnalyzerTest, LowEntropyFileIsNotSuspicious) {
     EXPECT_NE(output.find("is not suspicious"), string::npos);
 }
 
-// Test repeated suspicion triggers removal
+// Test repeated suspicious events removal
 TEST_F(AnalyzerTest, UpdateWatchTriggersRemovalOnRepeatedSuspicion) {
     // Simulate the same PID being suspicious twice within an hour.
     time_t now = time(nullptr);
