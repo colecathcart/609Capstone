@@ -32,3 +32,8 @@ The `encrypt.py` script in the `encryption_zone` directory is used to encrypt fi
 
 Testing with `encrypt.cpp` is also possible, but currently requires manual compilation. 
 
+## Features In-Progress
+
+- GUI
+- Performance Optimization
+- Admin Monitoring Dashboard
