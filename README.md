@@ -37,3 +37,4 @@ Testing with `encrypt.cpp` is also possible, but currently requires manual compi
 - GUI
 - Performance Optimization
 - Admin Monitoring Dashboard
+- Honey Files
