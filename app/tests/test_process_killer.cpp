@@ -17,7 +17,7 @@ protected:
 
 class ProcessKillerTest : public ProcessKiller, public ::testing::Test {
 protected:
-    ProcessKiller pk; // Use the original ProcessKiller for tests that don't require user simulation
+    ProcessKiller pk; 
 };
 
 // Test that getExecutablePath returns a non-empty string for a valid PID
@@ -64,7 +64,6 @@ TEST(ProcessKillerDerivedTest, RemoveExecutableTemporaryFile_UserConfirmsDeletio
     ofs << "dummy content";
     ofs.close();
     
-    // Ensure the temporary file exists.
     EXPECT_TRUE(filesystem::exists(tempFile));
     
     // Call removeExecutable, which should now simulate the user pressing "Yes"
