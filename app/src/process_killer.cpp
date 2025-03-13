@@ -1,4 +1,4 @@
-#include "../include/process_killer.h"
+#include "process_killer.h"
 #include "logger.h"
 #include <filesystem>
 #include <iostream>
