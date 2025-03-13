@@ -1,4 +1,4 @@
-#include "../include/process_killer.h"
+#include "process_killer.h"
 #include "logger.h"
 #include <filesystem>
 #include <iostream>
@@ -43,23 +43,27 @@ bool ProcessKiller::killFamily(pid_t pid) {
     }
 }
 
+bool ProcessKiller::promptUserForExecutableRemoval(const string& ransomware_path) const {
+    // Prompt the user for executable deletion using Zenity
+    string command = "zenity --question --text='A potentially malicious executable was found at " 
+                     + ransomware_path + ". Do you want to delete it?' --title='Suspicious File Detected' 2>/dev/null";
+    int result = system(command.c_str());
+    // Zenity returns 0 for "Yes", 1 for "No"
+    return (result == 0);
+}
+
 bool ProcessKiller::removeExecutable(const string& ransomware_path) const {
     if (ransomware_path.empty()) {
         cerr << "Executable path is empty. Skipping deletion." << endl;
         return false;
     }
 
-    // Pop-up confirmation dialog using Zenity
-    string command = "zenity --question --text='A potentially malicious executable was found at " + ransomware_path + ". Do you want to delete it?' --title='Suspicious File Detected' 2>/dev/null";
-    int result = system(command.c_str());
-
-    // Check if the user clicked "Yes" (Zenity returns 0 for "Yes", 1 for "No")
-    if (result != 0) {
-        cout << "User canceled executable deletion." << endl;
-        return false;
-    }
-
     if (filesystem::exists(ransomware_path)) {
+        // Prompt the user if they want to delete the executable.
+        if (!promptUserForExecutableRemoval(ransomware_path)) {
+            cout << "User canceled executable deletion." << endl;
+            return false;
+        }
         if (filesystem::remove(ransomware_path)) {
             cout << "Successfully deleted ransomware executable: " << ransomware_path << endl;
             return true;
