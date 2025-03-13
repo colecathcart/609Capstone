@@ -93,9 +93,7 @@ TEST_F(AnalyzerTest, UpdateWatchTriggersRemovalOnRepeatedSuspicion) {
                  1005);
 
     // First call: should update watch (suspicious).
-    testing::internal::CaptureStdout();
     analyzer.analyze(event1);
-    string output1 = testing::internal::GetCapturedStdout();
 
     // Second call: triggers removal because it’s the same PID again soon.
     testing::internal::CaptureStdout();
