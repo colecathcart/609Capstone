@@ -10,12 +10,12 @@ using namespace std::chrono;
 class EntropyCalculatorTest : public ::testing::Test {
     protected:
         EntropyCalculator calculator;
-        string encrypted_text = "tests/test_files/encrypted_text.txt.gpg";
+        string encrypted_text = "tests/test_files/encrypted_text.txt";
         string plain_text = "tests/test_files/plain_text.txt";
-        string encrypted_image = "tests/test_files/encrypted_image.jpg.gpg";
+        string encrypted_image = "tests/test_files/encrypted_image.jpg";
         string plain_image = "tests/test_files/plain_image.jpg";
         string plain_compressed = "tests/test_files/plain_compressed.zip";
-        string encrypted_compressed = "tests/test_files/encrypted_compressed.zip.gpg";
+        string encrypted_compressed = "tests/test_files/encrypted_compressed.zip";
         string large_test_file = "tests/test_files/large_test_file.bin";
 };
 
