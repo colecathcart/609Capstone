@@ -8,6 +8,7 @@ protected:
     EventDetector ed;
 };
 
+// Test hidden path detection
 TEST_F(EventDetectorTest, HiddenPathDetection) {
     // Expect paths with hidden directories (starting with '.') to return true.
     EXPECT_TRUE(ed.is_hidden_path("/home/user/.hidden/file.txt"));
@@ -16,6 +17,7 @@ TEST_F(EventDetectorTest, HiddenPathDetection) {
     EXPECT_FALSE(ed.is_hidden_path("/home/user/visible/file.txt"));
 }
 
+// Test non concerning path detection
 TEST_F(EventDetectorTest, NoConcernPathDetection) {
     // Paths in /tmp/ or /var/spool/ should be ignored.
     EXPECT_TRUE(ed.is_no_concern_path("/tmp/somefile.txt"));
@@ -24,12 +26,14 @@ TEST_F(EventDetectorTest, NoConcernPathDetection) {
     EXPECT_FALSE(ed.is_no_concern_path("/home/user/somefile.txt"));
 }
 
+// Test returning the fanotify file descriptor
 TEST_F(EventDetectorTest, ValidFanotifyFd) {
     int fd = ed.get_fanotify_fd();
     // A valid file descriptor should be non-negative.
     EXPECT_GE(fd, 0);
 }
 
+// Test enqueuing an event
 TEST_F(EventDetectorTest, EnqueueEventWorks) {
     // Create a dummy event.
     Event testEvent("TEST", "/tmp/test.txt", "test.txt", "txt", time(nullptr), 1234);
