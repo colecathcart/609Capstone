@@ -27,5 +27,8 @@ If you create new C++ files, they will need to be added to the Makefile.
 ## Encryption Script
 
 The `encrypt.py` script in the `encryption_zone` directory is used to encrypt files for testing the ransomware detector.
+
+**WARNING**: If testing the ransomware detector using the `encrypt.py` script, do not delete the executable when prompted - this will remove Python from your environment.
+
 Testing with `encrypt.cpp` is also possible, but currently requires manual compilation. 
 
