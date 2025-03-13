@@ -64,6 +64,7 @@ TEST(ProcessKillerDerivedTest, RemoveExecutableTemporaryFile_UserConfirmsDeletio
     ofs << "dummy content";
     ofs.close();
     
+    // Ensure the temporary file exists.
     EXPECT_TRUE(filesystem::exists(tempFile));
     
     // Call removeExecutable, which should now simulate the user pressing "Yes"
