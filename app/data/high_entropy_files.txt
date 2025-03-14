@@ -1,0 +1,17 @@
+x-gzip
+gzip
+pdf
+x-tar
+zip
+x-bzip
+x-bzip2
+x-zip-compressed
+x-7z-compressed
+x-rar-compressed
+image
+audio
+video
+java-archive
+x-msdownload
+x-executable
+x-pie-executable

@@ -3,6 +3,7 @@
 
 #include <unordered_set>
 #include <string>
+#include <magic.h>
 
 using namespace std;
 
@@ -20,29 +21,23 @@ class FileExtensionChecker
         FileExtensionChecker();
 
         /**
-         * @brief Checks if a file extension represents a compressed file.
+         * @brief Checks if a file type represents a high-entropy file.
          * @param filepath The path to the file to be tested.
          */
-        bool is_compressed(const string& filepath) const;
+        bool needs_monobit(const string& filepath) const;
 
         /**
          * @brief Checks if a file extension is suspicious.
          * @param filepath The path to the file to be tested.
          */
         bool is_suspicious(const string& filepath) const;
-
-        /**
-         * @brief Checks if a file extension represents an image.
-         * @param filepath The path to the file to be tested.
-         */
-        bool is_image(const string& filepath) const;
     
     private:
 
         /**
-         * @brief A set of known compressed file extensions.
+         * @brief A set of known high-entropy file types.
          */
-        static const unordered_set<string> known_compressed;
+        static const unordered_set<string> known_high_ent;
 
         /**
          * @brief A set of known suspicious file extensions.
@@ -50,15 +45,21 @@ class FileExtensionChecker
         static const unordered_set<string> known_suspicious;
 
         /**
-         * @brief A set of known image file extensions.
+         * @brief Pointer to a cookie in the magic database
          */
-        static const unordered_set<string> known_images;
+        magic_t magic;
 
         /**
          * @brief Returns an extension of a file.
          * @param filepath The path to the file.
          */
         string get_extension(const string& filepath) const;
+
+        /**
+         * @brief Returns the cropped MIME type of the file (the top-level indicator unless application/)
+         * @param filepath The path to the file
+         */
+        string get_type(const string& filepath) const;
 
         /**
          * @brief loads known extensions stored in a file into an unordered set.

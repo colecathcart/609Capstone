@@ -38,7 +38,7 @@ void Analyzer::analyze(Event& event)
         return;
     }
 
-    if(file_checker.is_compressed(event.get_filename()) || file_checker.is_image(event.get_filename())) {
+    if(file_checker.needs_monobit(event.get_filepath())) {
         if(calculator.monobit_test(event.get_filepath())) {
             logger->log("Process " + to_string(event.get_pid()) + " is suspicious, updating watch.");
             update_watch(event.get_pid(), event.get_time());
