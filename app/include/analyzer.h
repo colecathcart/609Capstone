@@ -57,6 +57,11 @@ class Analyzer
          * @brief Helper function to update suspicious_procs and take action if required
          */
         void update_watch(pid_t pid, time_t timestamp);
+
+        /**
+         * @brief reference to singleton logger
+         */
+        Logger* logger;
 };
 
 #endif

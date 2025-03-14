@@ -3,6 +3,7 @@
 
 #include <string>
 #include <fstream>
+#include <mqueue.h>
 
 using namespace std;
 
@@ -21,13 +22,9 @@ private:
      */
     ofstream logFile;
     /**
-     * @brief the named pipe to log to (for communicating logs to the GUI)
+     * @brief the message queue to log to (for communicating logs to the GUI)
      */
-    int fifo;
-    /**
-     * @brief the path of the named pipe (for communicating logs to the GUI)
-     */
-    string pipePath;
+    mqd_t mq;
     
     Logger(); // Private constructor
     
@@ -47,7 +44,7 @@ public:
      * @param message The message to log
      * @param whereto Where to log the message: 0 = stdout, 1 = logfile, 2 = fifo pipe, 3 = all
      */
-    void log(const string& message, int whereto = 0);
+    void log(const string& message, int whereto = 2);
 };
 
 #endif

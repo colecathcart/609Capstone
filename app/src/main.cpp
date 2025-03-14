@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
     }
 
     Logger* logger = Logger::getInstance();
-    logger->log("Starting detector...", 3);
+    logger->log("Starting detector...");
 
     EventDetector detector;
     detector.add_watch(argv[1]);
