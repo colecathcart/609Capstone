@@ -185,7 +185,7 @@ void EventDetector::process_events() {
                 Event event(str, full_path, filename, extension, timestamp, metadata->pid);
 
                 // Log the event
-                log_event(event);
+                logger->log(event.print());
 
                 // Save last path
                 strcpy(last_path, full_path.c_str());
@@ -202,11 +202,6 @@ void EventDetector::process_events() {
             metadata = FAN_EVENT_NEXT(metadata, len);
         }
     }
-}
-
-// Log the event details
-void EventDetector::log_event(const Event& event) {
-    event.print();
 }
 
 // Enqueue the event into the event queue
