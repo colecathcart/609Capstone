@@ -16,6 +16,8 @@
 #include "event.h"
 #include "analyzer.h"
 
+using namespace std;
+
 /**
  * @brief Class to monitor file system events using fanotify.
  */
@@ -23,9 +25,10 @@ class EventDetector {
 private:
     int fanotify_fd; ///< File descriptor for fanotify instance
     int ret;         ///< Return value for system calls
-    std::queue<Event> event_queue; ///< Queue to store recent events
+    queue<Event> event_queue; ///< Queue to store recent events
     size_t max_queue_size = 100; ///< Maximum number of stored events
     Analyzer analyzer; ///< For passing events to
+    Logger* logger; ///< Reference to singleton logger
 
 public:
     /**
@@ -42,18 +45,12 @@ public:
      * @brief Adds a watch on the specified path for file events.
      * @param path The directory or file path to monitor.
      */
-    void add_watch(const std::string &path);
+    void add_watch(const string &path);
 
     /**
      * @brief Processes incoming fanotify events and extracts relevant information.
      */
     void process_events();
-
-    /**
-     * @brief Logs event details to the console.
-     * @param event The event to be logged.
-     */
-    void log_event(const Event &event);
 
     /**
      * @brief Stores an event in the event queue, maintaining a fixed queue size.
@@ -73,14 +70,14 @@ public:
      * @param path The path to check.
      * @return True if the path is hidden, false otherwise.
      */
-    bool is_hidden_path(const std::string &path);
+    bool is_hidden_path(const string &path);
 
     /**
      * @brief Checks if the specified path is not a concern, like /tmp or /var/spool/.
      * @param path The path to check.
      * @return True if the path is not a concern, false otherwise.
      */
-    bool is_no_concern_path(const std::string &path);
+    bool is_no_concern_path(const string &path);
 };
 
 #endif // EVENT_DETECTOR_H

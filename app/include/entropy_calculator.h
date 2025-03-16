@@ -2,6 +2,7 @@
 #define ENTROPYCALCULATOR
 
 #include <string>
+#include "logger.h"
 
 using namespace std;
 
@@ -50,6 +51,11 @@ class EntropyCalculator
          * @brief Helper function to ignore small files (< 1 KB)
          */
         bool is_small_file(const string& filepath) const;
+
+        /**
+         * @brief Reference to singleton logger
+         */
+        Logger* logger;
 };
 
 #endif

@@ -14,26 +14,27 @@ using namespace std;
 
 // Constructor for EventDetector
 EventDetector::EventDetector(): analyzer(Analyzer()) {
-    cout << "Initializing EventDetector..." << endl;
+    logger = Logger::getInstance();
+    logger->log( "Initializing EventDetector...");
     // Initialize fanotify file descriptor
     fanotify_fd = fanotify_init(FAN_CLASS_CONTENT, O_RDONLY);
     if (fanotify_fd == -1) {
         perror("fanotify_init");
         exit(EXIT_FAILURE);
     }
-    cout << "fanotify_fd initialized with FD: " << fanotify_fd << endl;
+    logger->log("fanotify_fd initialized with FD: " + to_string(fanotify_fd));
 }
 
 // Destructor for EventDetector
 EventDetector::~EventDetector() {
-    cout << "Closing fanotify_fd: " << fanotify_fd << endl;
+    logger->log("Closing fanotify_fd: " + to_string(fanotify_fd));
     // Close the fanotify file descriptor
     close(fanotify_fd);
 }
 
 // Add a watch on the specified path
 void EventDetector::add_watch(const string& path) {
-    cout << "Adding watch for path: " << path << endl;
+    logger->log("Adding watch for path: " + path);
 
     // Add a fanotify mark on the specified path
     int ret = fanotify_mark(fanotify_fd, FAN_MARK_ADD | FAN_MARK_MOUNT, FAN_CLOSE_WRITE, AT_FDCWD, path.c_str());
@@ -41,7 +42,7 @@ void EventDetector::add_watch(const string& path) {
         perror("fanotify_mark");
         exit(EXIT_FAILURE);
     } else {
-        cout << "Watching " << path << endl;
+        logger->log("Watching " + path);
     }
 }
 
@@ -184,7 +185,7 @@ void EventDetector::process_events() {
                 Event event(str, full_path, filename, extension, timestamp, metadata->pid);
 
                 // Log the event
-                log_event(event);
+                logger->log(event.print());
 
                 // Save last path
                 strcpy(last_path, full_path.c_str());
@@ -203,16 +204,11 @@ void EventDetector::process_events() {
     }
 }
 
-// Log the event details
-void EventDetector::log_event(const Event& event) {
-    event.print();
-}
-
 // Enqueue the event into the event queue
 void EventDetector::enqueue_event(const Event& event) {
-    cout << "Enqueuing event: " << event.get_event_type() << " - " << event.get_filepath() << endl;
+    logger->log("Enqueuing event: " + event.get_event_type() + " - " + event.get_filepath());
     if (event_queue.size() >= max_queue_size) {
-        cout << "Event queue is full, popping an event." << endl;
+        logger->log("Event queue is full, popping an event.");
         event_queue.pop();
     }
     event_queue.push(event);
@@ -220,6 +216,6 @@ void EventDetector::enqueue_event(const Event& event) {
 
 // Get the fanotify file descriptor
 int EventDetector::get_fanotify_fd() const {
-    cout << "Returning fanotify_fd: " << fanotify_fd << endl;
+    logger->log("Returning fanotify_fd: " + to_string(fanotify_fd));
     return fanotify_fd;
 }

@@ -6,6 +6,10 @@ enc
 enc0
 enc1
 locked
+locky
 lock
 block
 secure
+gpg
+pgp
+aes
