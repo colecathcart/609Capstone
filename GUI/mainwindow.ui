@@ -6,47 +6,49 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>424</width>
+    <height>268</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>EntropyCop</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>100</y>
-      <width>251</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>215</y>
-      <width>171</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Click Me!</string>
-    </property>
-   </widget>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="currentIndex">
+         <number>2</number>
+        </property>
+        <widget class="QWidget" name="summary_tab">
+         <attribute name="title">
+          <string>Summary</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="logging_tab">
+         <attribute name="title">
+          <string>Logging</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="whitelist_tab">
+         <attribute name="title">
+          <string>Whitelist</string>
+         </attribute>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>424</width>
      <height>23</height>
     </rect>
    </property>
