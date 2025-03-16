@@ -5,6 +5,7 @@ x-tar
 zip
 x-bzip
 x-bzip2
+x-xz
 x-zip-compressed
 x-7z-compressed
 x-rar-compressed

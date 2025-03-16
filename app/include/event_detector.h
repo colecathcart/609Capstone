@@ -53,12 +53,6 @@ public:
     void process_events();
 
     /**
-     * @brief Logs event details to the console.
-     * @param event The event to be logged.
-     */
-    void log_event(const Event &event);
-
-    /**
      * @brief Stores an event in the event queue, maintaining a fixed queue size.
      * @param event The event to be stored.
      */
