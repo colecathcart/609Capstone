@@ -2,5 +2,7 @@
 app/app
 **/*.o
 
+encryption_zone/files2encrypt
 app/test_files
+app/log.txt
 settings.json

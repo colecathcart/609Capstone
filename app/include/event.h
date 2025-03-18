@@ -5,25 +5,30 @@
 #include <ctime>
 #include <iostream>
 
+using namespace std;
+
 class Event {
 private:
-    std::string event_type;
-    std::string filepath;
-    std::string filename;
-    std::string extension;
-    std::time_t time;
+    string event_type;
+    string filepath;
+    string filename;
+    string extension;
+    time_t time;
+    pid_t pid;
 
 public:
-    Event(const std::string& type, const std::string& path, 
-          const std::string& name, const std::string& ext, std::time_t timestamp);
+    Event(const string& type, const string& path, 
+          const string& name, const string& ext, 
+          time_t timestamp, pid_t pid);
 
-    std::string get_event_type() const;
-    std::string get_filepath() const;
-    std::string get_filename() const;
-    std::string get_extension() const;
-    std::time_t get_time() const;
+    string get_event_type() const;
+    string get_filepath() const;
+    string get_filename() const;
+    string get_extension() const;
+    time_t get_time() const;
+    pid_t get_pid() const;
 
-    void print() const;
+    string print() const;
 };
 
 #endif // EVENT

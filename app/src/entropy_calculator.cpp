@@ -10,18 +10,40 @@ typedef unsigned char BYTE;
 using namespace std;
 
 EntropyCalculator::EntropyCalculator(): buffer_size(8 * 1024) {
-    // default
+    logger = Logger::getInstance();
 }
 
 EntropyCalculator::EntropyCalculator(int buff_size_kb): buffer_size(buff_size_kb * 1024) {
+    logger = Logger::getInstance();
+}
 
+bool EntropyCalculator::is_small_file(const string& filepath) const {
+    ifstream file(filepath, ios::binary);
+
+    if (!file.is_open()) {
+        logger->log("Error opening file");
+        return -1;
+    }
+
+    file.seekg(0, ios::end);
+    if(file.tellg() < 1024) {
+        file.close();
+        return true;
+    }
+    file.close();
+    return false;
 }
 
 double EntropyCalculator::get_shannon_entropy(const string& filepath) const {
+    
+    if(is_small_file(filepath)) {
+        return 0;
+    }
+    
     ifstream file(filepath, ios::binary);
     
     if (!file.is_open()) {
-        cerr << "Error opening file." << endl;
+        logger->log("Error opening file");
         return -1;
     }
 
@@ -47,10 +69,15 @@ double EntropyCalculator::get_shannon_entropy(const string& filepath) const {
 }
 
 bool EntropyCalculator::monobit_test(const string& filepath) const {
+
+     if(is_small_file(filepath)) {
+        return false;
+    }
+
     ifstream file(filepath, ios::binary);
 
     if(!file) {
-        cerr << "Error opening file" << endl;
+        logger->log("Error opening file");
         return 1;
     }
 

@@ -5,9 +5,8 @@
 using namespace std;
 
 // Static variable definitions
-const unordered_set<string> FileExtensionChecker::known_compressed = load_known_extensions("known_extensions/compressed.txt");
-const unordered_set<string> FileExtensionChecker::known_suspicious = load_known_extensions("known_extensions/suspicious.txt");
-const unordered_set<string> FileExtensionChecker::known_images = load_known_extensions("known_extensions/images.txt");
+const unordered_set<string> FileExtensionChecker::known_high_ent = load_known_extensions("data/high_entropy_files.txt");
+const unordered_set<string> FileExtensionChecker::known_suspicious = load_known_extensions("data/known_encrypted.txt");
 
 unordered_set<string> FileExtensionChecker::load_known_extensions(const string& filename) {
     unordered_set<string> extensions;
@@ -27,7 +26,31 @@ unordered_set<string> FileExtensionChecker::load_known_extensions(const string& 
     return extensions;
 }
 
-FileExtensionChecker::FileExtensionChecker() {}
+FileExtensionChecker::FileExtensionChecker() {
+    magic = magic_open(MAGIC_MIME_TYPE);
+    if (magic == nullptr) {
+        cerr << "Error initializing libmagic" << endl;
+    }
+    if (magic_load(magic, nullptr) == -1) {
+        cerr << "Error: " << magic_error(magic) << endl;
+        magic_close(magic);
+    }
+}
+
+string FileExtensionChecker::get_type(const string& filepath) const {
+    const char* mime_type = magic_file(magic, filepath.c_str());
+    // cout << mime_type << endl;
+    if(!mime_type) {
+        return "?";
+    }
+
+    string mime_string(mime_type);
+    if(mime_string.find("application/") == 0) {
+        return mime_string.substr(12);
+    }
+    size_t pos = filepath.find('/');
+    return mime_string.substr(0, pos);
+}
 
 string FileExtensionChecker::get_extension(const string& filepath) const {
     size_t pos = filepath.rfind('.');
@@ -38,12 +61,10 @@ string FileExtensionChecker::get_extension(const string& filepath) const {
     return "";
 }
 
-bool FileExtensionChecker::is_compressed(const string& filepath) const {
-    string file_extension = get_extension(filepath);
-    if (file_extension != "") {
-        bool is_file_compressed = known_compressed.find(file_extension) != known_compressed.end();
-        return is_file_compressed;
-    }
+bool FileExtensionChecker::needs_monobit(const string& filepath) const {
+    string file_extension = get_type(filepath);
+    bool is_high_ent = known_high_ent.find(file_extension) != known_high_ent.end();
+    return is_high_ent;
     return false;
 }
 
@@ -52,15 +73,6 @@ bool FileExtensionChecker::is_suspicious(const string& filepath) const {
     if (file_extension != "") {
         bool is_file_suspicious = known_suspicious.find(file_extension) != known_suspicious.end();
         return is_file_suspicious;
-    }
-    return false;
-}
-
-bool FileExtensionChecker::is_image(const string& filepath) const {
-    string file_extension = get_extension(filepath);
-    if (file_extension != "") {
-        bool is_file_an_image = known_images.find(file_extension) != known_images.end();
-        return is_file_an_image;
     }
     return false;
 }
