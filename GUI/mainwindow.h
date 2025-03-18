@@ -17,6 +17,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_newExeButton_clicked();
+
+    void on_newDirectoryButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
