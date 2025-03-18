@@ -1,7 +1,7 @@
-all: app
+all: ransomware_detector
 
-app: main.o entropy_calculator.o file_extension_checker.o event.o event_detector.o analyzer.o process_killer.o logger.o
-	g++ -Wall main.o entropy_calculator.o file_extension_checker.o event.o event_detector.o analyzer.o process_killer.o logger.o -lmagic -o app
+ransomware_detector: main.o entropy_calculator.o file_extension_checker.o event.o event_detector.o analyzer.o process_killer.o logger.o
+	g++ -Wall main.o entropy_calculator.o file_extension_checker.o event.o event_detector.o analyzer.o process_killer.o logger.o -lmagic -o ransomware_detector
 
 main.o: src/main.cpp 
 	g++ -Wall -Iinclude -c src/main.cpp
