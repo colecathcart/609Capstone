@@ -62,7 +62,6 @@ public:
      * @brief Retrieves the fanotify file descriptor.
      * @return The fanotify file descriptor.
      */
-
     int get_fanotify_fd() const;
 
     /**
