@@ -65,7 +65,6 @@ bool FileExtensionChecker::needs_monobit(const string& filepath) const {
     string file_extension = get_type(filepath);
     bool is_high_ent = known_high_ent.find(file_extension) != known_high_ent.end();
     return is_high_ent;
-    return false;
 }
 
 bool FileExtensionChecker::is_suspicious(const string& filepath) const {
