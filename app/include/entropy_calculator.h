@@ -36,9 +36,15 @@ class EntropyCalculator
          * @brief Function to perform the NIST monobit test on a given file.
          * A true result denotes that 90% or more of the blocks in the file
          * (determined by the buffer_size) passed the test.
-         * @param filepath The path to the files to be tested.
+         * @param filepath The path to the file to be tested.
          */
         bool monobit_test(const string& filepath) const;
+
+        /**
+         * @brief Function to get the SHA256 hash of the file, for the purpose of comparison.
+         * @param filepath The path to the file to be tested.
+         */
+        string get_file_hash(const string& filepath) const;
     
     private:
 
@@ -46,16 +52,15 @@ class EntropyCalculator
          * @brief The size of buffer (in Bytes) to be read from a file at a time
          */
         const size_t buffer_size;
-
+        /**
+         * @brief Reference to singleton logger
+         */
+        Logger* logger;
         /**
          * @brief Helper function to ignore small files (< 1 KB)
          */
         bool is_small_file(const string& filepath) const;
 
-        /**
-         * @brief Reference to singleton logger
-         */
-        Logger* logger;
 };
 
 #endif
