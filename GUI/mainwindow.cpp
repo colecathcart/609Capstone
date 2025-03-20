@@ -29,8 +29,13 @@ void MainWindow::fetchData() {
 }
 
 void MainWindow::update(const bool isOn, const double cpu, const double mem) {
-    ui->cpuProgressBar->setValue(static_cast<int>(cpu));
-    ui->memProgressBar->setValue(static_cast<int>(mem));
+    // Update the CPU progress bar with 2 decimal places
+    ui->cpuProgressBar->setValue(static_cast<int>(cpu));  // Update the actual progress value
+    ui->cpuProgressBar->setFormat(QString::number(cpu, 'f', 2) + "%");
+
+    // Update the memory progress bar with 2 decimal places
+    ui->memProgressBar->setValue(static_cast<int>(mem));  // Update the actual progress value
+    ui->memProgressBar->setFormat(QString::number(mem, 'f', 2) + "%");
     if (isOn) {
         ui->statusText->setMarkdown("Ransomware detector is running.");
     } else {

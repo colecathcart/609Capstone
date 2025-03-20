@@ -12,7 +12,8 @@ SOURCES += \
     adddirectorytowhitelistdialog.cpp \
     addexetowhitelistdialog.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    systemmonitor.cpp
 
 HEADERS += \
     adddirectorytowhitelistdialog.h \

@@ -26,9 +26,10 @@ public:
     void fetchAndNotify(const QString &processName) {
         // Find all PIDs with pgrep
         QProcess pidProcess;
-        pidProcess.start("/usr/bin/pgrep -f " + processName);
+        pidProcess.start("/bin/bash", QStringList() << "-c" << "pgrep -f \"" + processName + "\"");
         pidProcess.waitForFinished();
         QString pidOutput = pidProcess.readAllStandardOutput().trimmed();
+
 
         if (pidOutput.isEmpty()) {
             notifyObservers(false, 0,0);
@@ -43,12 +44,12 @@ public:
 
         for (const QString &pid : pids) {
             QProcess psProcess;
-            psProcess.start("ps -p " + pid + " -o %cpu,%mem --no-headers");
+            psProcess.start("/bin/bash", QStringList() << "-c" << QString("ps -p %1 -o %cpu,%mem --no-headers").arg(pid));
             psProcess.waitForFinished();
             QString output = psProcess.readAllStandardOutput().trimmed();
 
             if (!output.isEmpty()) {
-                QStringList values = output.split(QRegularExpression("\\s+"));
+                QStringList values = output.split(whitespaceSplitter);
                 if (values.size() == 2) {
                     totalCpu += values[0].toDouble();
                     totalMem += values[1].toDouble();
@@ -62,6 +63,7 @@ public:
 
 private:
     QList<SystemObserver*> observers;
+    static QRegularExpression whitespaceSplitter;
 };
 
 #endif // SYSTEMMONITOR_H
