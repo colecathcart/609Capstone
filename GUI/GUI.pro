@@ -17,7 +17,9 @@ SOURCES += \
 HEADERS += \
     adddirectorytowhitelistdialog.h \
     addexetowhitelistdialog.h \
-    mainwindow.h
+    mainwindow.h \
+    systemmonitor.h \
+    systemobserver.h
 
 FORMS += \
     adddirectorytowhitelistdialog.ui \
