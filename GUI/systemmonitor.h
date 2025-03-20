@@ -4,6 +4,7 @@
 #include <QString>
 #include <QList>
 #include <QProcess>
+#include <QRegularExpression>
 #include "systemobserver.h"
 
 class SystemMonitor {
@@ -25,7 +26,7 @@ public:
     void fetchAndNotify(const QString &processName) {
         // Find all PIDs with pgrep
         QProcess pidProcess;
-        pidProcess.start("pgrep -f " + processName);
+        pidProcess.start("/usr/bin/pgrep -f " + processName);
         pidProcess.waitForFinished();
         QString pidOutput = pidProcess.readAllStandardOutput().trimmed();
 
@@ -40,14 +41,14 @@ public:
         double totalCpu = 0.0;
         double totalMem = 0.0;
 
-        for (const QStrinf &pid : pids) {
+        for (const QString &pid : pids) {
             QProcess psProcess;
             psProcess.start("ps -p " + pid + " -o %cpu,%mem --no-headers");
             psProcess.waitForFinished();
             QString output = psProcess.readAllStandardOutput().trimmed();
 
             if (!output.isEmpty()) {
-                QStringList values = output.split(QRegExp("\\s+"));
+                QStringList values = output.split(QRegularExpression("\\s+"));
                 if (values.size() == 2) {
                     totalCpu += values[0].toDouble();
                     totalMem += values[1].toDouble();

@@ -664,7 +664,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <number>10</number>
             </property>
             <property name="format">
-             <string>234 / 8000 Mb</string>
+             <string>%p%</string>
             </property>
            </widget>
           </widget>
