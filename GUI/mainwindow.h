@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <systemmonitor.h>
 #include <systemobserver.h>
+#include <detectormanager.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -28,8 +29,14 @@ private slots:
 
     void fetchData();
 
+    void on_startButton_released();
+
+    void on_stopButton_released();
+
 private:
     Ui::MainWindow *ui;
     SystemMonitor *monitor;
+    DetectorManager *detector;
+    bool isOn;
 };
 #endif // MAINWINDOW_H

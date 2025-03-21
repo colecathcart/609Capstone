@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     adddirectorytowhitelistdialog.cpp \
     addexetowhitelistdialog.cpp \
+    detectormanager.cpp \
     main.cpp \
     mainwindow.cpp \
     systemmonitor.cpp
@@ -18,6 +19,7 @@ SOURCES += \
 HEADERS += \
     adddirectorytowhitelistdialog.h \
     addexetowhitelistdialog.h \
+    detectormanager.h \
     mainwindow.h \
     systemmonitor.h \
     systemobserver.h
