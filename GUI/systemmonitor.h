@@ -64,6 +64,7 @@ public:
 private:
     QList<SystemObserver*> observers;
     static QRegularExpression whitespaceSplitter;
+
 };
 
 #endif // SYSTEMMONITOR_H
