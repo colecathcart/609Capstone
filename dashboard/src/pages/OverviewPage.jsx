@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Monitor, Skull, AlertTriangle, OctagonAlert, Settings } from "lucide-react";
+import { Monitor, ShieldCheck, ShieldAlert, ShieldX, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
@@ -51,10 +51,10 @@ const OverviewPage = () => {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 1 }}
 				>
-					<StatCard name="Threats Detected" icon={AlertTriangle} value="450" color="rgb(73, 130, 216)" />
-					<StatCard name="Processes Killed" icon={Skull} value="400" color="rgb(73, 130, 216)" />
+					<StatCard name="Threats Detected" icon={ShieldAlert} value="450" color="rgb(73, 130, 216)" />
+					<StatCard name="Processes Killed" icon={ShieldCheck} value="400" color="rgb(73, 130, 216)" />
 					<StatCard name="Devices" icon={Monitor} value="6" color="rgb(73, 130, 216)" />
-					<StatCard name="Compromises" icon={OctagonAlert} value="50" color="rgb(73, 130, 216)" />
+					<StatCard name="Compromises" icon={ShieldX} value="50" color="rgb(73, 130, 216)" />
 				</motion.div>
 
 				{/* CHARTS */}
