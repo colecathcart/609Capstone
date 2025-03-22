@@ -175,14 +175,12 @@ void EventDetector::process_events() {
                 // Extract filename and extension from the full path
                 size_t last_slash = full_path.find_last_of("/");
                 string filename = (last_slash != string::npos) ? full_path.substr(last_slash + 1) : full_path;
-                size_t dot_pos = filename.find_last_of(".");
-                string extension = (dot_pos != string::npos) ? filename.substr(dot_pos + 1) : "";
 
                 // Get the current timestamp
                 time_t timestamp = time(nullptr);
 
                 // Create an Event object
-                Event event(str, full_path, filename, extension, timestamp, metadata->pid);
+                Event event(str, full_path, filename, timestamp, metadata->pid);
 
                 // Log the event
                 logger->log(event.print());
@@ -191,7 +189,6 @@ void EventDetector::process_events() {
                 strcpy(last_path, full_path.c_str());
 
                 // Call analyzer
-
                 analyzer.analyze(event);
 
                 // Close the file descriptor associated with the event

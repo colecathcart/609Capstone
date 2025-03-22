@@ -7,6 +7,7 @@
 #include "entropy_calculator.h"
 #include "file_extension_checker.h"
 #include "process_killer.h"
+#include <cstdint>
 
 using namespace std;
 
@@ -39,6 +40,16 @@ class Analyzer
         unordered_map<pid_t, time_t> suspicious_procs;
 
         /**
+         * @brief A map holding trusted procs with their creation time in clock ticks
+         */
+        unordered_map<pid_t, uint64_t> safe_procs;
+
+        /**
+         * @brief A set holding safe or whitelisted packages
+         */
+        unordered_set<string> safe_packages;
+
+        /**
          * @brief An instance of EntropyCalculator for determining encryption
          */
         EntropyCalculator calculator;
@@ -64,9 +75,21 @@ class Analyzer
         void update_watch(pid_t pid, time_t timestamp);
 
         /**
-         * @brief helper function to save hash to a file
+         * @brief Logic to determine if a process is trusted, or previously trusted, and update
+         * the safe_procs map accordingly
+         * @param pid the process ID to check
+         */
+        bool is_trusted_process(pid_t pid);
+
+        /**
+         * @brief Helper function to save hash to a file
          */
         void save_hash(const string& hash) const;
+
+        /**
+         * @brief Helper function to get process start time
+         */
+        uint64_t get_start_time(pid_t pid);
 
 };
 
