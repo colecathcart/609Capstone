@@ -19,7 +19,7 @@ class MainWindow : public QMainWindow, public SystemObserver
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void update(const bool isOn, const double cpu, const double mem) override;
+    void update(const bool isOn, const double cpu, const double mem, const QString &log) override;
 
 
 private slots:
