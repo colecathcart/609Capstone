@@ -7,9 +7,14 @@ DetectorManager::DetectorManager() {}
 
 void DetectorManager::startDetector() {
     QString detectorPath = QDir::cleanPath(QCoreApplication::applicationDirPath() + "../../../../app/ransomware_detector");
-    QString program = QString("pkexec %1 /").arg(detectorPath);
+    QString program = QString("%1 /").arg(detectorPath);
 
-    QProcess::startDetached("/bin/bash", QStringList() << "-c" << program);
+    QString workingDir = QFileInfo(detectorPath).absolutePath();
+
+    if (!QProcess::startDetached("/bin/bash", QStringList() << "-c" << program, workingDir)) {
+        qDebug() << "Failed to start detector.";
+    }
+
 }
 
 void DetectorManager::stopDetector() {
