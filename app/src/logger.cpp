@@ -51,7 +51,7 @@ void Logger::log(const string& message, int whereto) {
             logFile << message << endl;
         }
     } else if(whereto == 2) {
-        string guimsg = message + '\n';
+        string guimsg = message;
         mq_send(mq, guimsg.c_str(), guimsg.size() + 1, 0);
     } else if(whereto == 3) {
         cout << message << endl;
