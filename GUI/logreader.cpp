@@ -1,13 +1,17 @@
 #include "logreader.h"
 #include <QDebug>
+#include <cstring>
+#include <cerrno>
 
 LogReader::LogReader() {
-    attr.mq_flags = 0;
-    attr.mq_maxmsg = 200;
-    attr.mq_msgsize = MAX_SIZE;
-    attr.mq_curmsgs = 0;
+    mq = mq_open(QUEUE_NAME, O_CREAT | O_RDONLY | O_NONBLOCK, 0666, &attr);
+    if (mq == (mqd_t)-1) {
+        qWarning() << "Failed to open message queue: " << strerror(errno);
+    }
 
-    mq = mq_open(QUEUE_NAME, O_CREAT | O_RDONLY, 0666, &attr);
+    if (mq_getattr(mq, &attr) == -1) {
+        qWarning() << "Failed to get queue attributes: " << strerror(errno);
+    }
 }
 
 LogReader::~LogReader() {
@@ -18,24 +22,23 @@ LogReader::~LogReader() {
 }
 
 QString LogReader::receive_message() {
-    memset(message, 0, MAX_SIZE);
+    char* buffer = new char[attr.mq_msgsize];
+    memset(buffer, 0, attr.mq_msgsize);
 
-    ssize_t bytes_read = mq_receive(mq, message, MAX_SIZE - 1, nullptr);
+    ssize_t bytes_read = mq_receive(mq, buffer, attr.mq_msgsize, nullptr);
     if (bytes_read >= 0) {
-        message[bytes_read] = '\0'; // Null-terminate safely
+        buffer[bytes_read] = '\0'; // Null-terminate
+        QString msg = QString::fromUtf8(buffer, bytes_read);
+        delete[] buffer;
+        qInfo() << "Received message: " << msg;
+        return msg;
+    } else {
+        if (errno == EAGAIN) {
+            qInfo() << "No messages available.";
+        } else {
+            qWarning() << "Failed to receive message: " << strerror(errno);
+        }
+        delete[] buffer;
+        return QString();
     }
-
-    if (bytes_read == -1) {
-        qInfo() << "Failed to receive message";
-    }
-
-    QString msg = QString::fromUtf8(message, bytes_read);
-
-    if (msg == MSG_STOP) {
-        qInfo() << "Received stop signal";
-        return QString(MSG_STOP);
-    }
-
-    qInfo() << "Received message: " << msg;
-    return msg;
 }
