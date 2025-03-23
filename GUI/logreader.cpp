@@ -30,6 +30,8 @@ QString LogReader::receive_message() {
         buffer[bytes_read] = '\0'; // Null-terminate
         QString msg = QString::fromUtf8(buffer, bytes_read);
         delete[] buffer;
+
+        msg.remove(QChar(0));
         qInfo() << "Received message: " << msg;
         return msg;
     } else {
