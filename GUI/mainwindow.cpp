@@ -40,7 +40,9 @@ void MainWindow::update(const bool isOn, const double cpu, const double mem, con
     ui->memProgressBar->setValue(static_cast<int>(mem));  // Update the actual progress value
     ui->memProgressBar->setFormat(QString::number(mem, 'f', 2) + "%");
 
-    ui->loggingText->append(log);
+    if (log != "") {
+        ui->loggingText->append(log);
+    }
 
     if (isOn) {
         this->isOn = true;
