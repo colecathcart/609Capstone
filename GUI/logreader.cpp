@@ -3,7 +3,7 @@
 
 LogReader::LogReader() {
     attr.mq_flags = 0;
-    attr.mq_maxmsg = 10;
+    attr.mq_maxmsg = 200;
     attr.mq_msgsize = MAX_SIZE;
     attr.mq_curmsgs = 0;
 
@@ -20,7 +20,10 @@ LogReader::~LogReader() {
 QString LogReader::receive_message() {
     memset(message, 0, MAX_SIZE);
 
-    ssize_t bytes_read = mq_receive(mq, message, MAX_SIZE, nullptr);
+    ssize_t bytes_read = mq_receive(mq, message, MAX_SIZE - 1, nullptr);
+    if (bytes_read >= 0) {
+        message[bytes_read] = '\0'; // Null-terminate safely
+    }
 
     if (bytes_read == -1) {
         qInfo() << "Failed to receive message";
