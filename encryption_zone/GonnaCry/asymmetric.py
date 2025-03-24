@@ -20,9 +20,11 @@ class assymetric():
 
     def generate_keys(self):
         self.key = RSA.generate(self.bit_len)
-        self.private_key_PEM = self.key.exportKey('OpenSSH')
-        self.public_key_PEM = self.key.publickey().exportKey('OpenSSH')
         
+        # self.private_key_PEM = self.key.exportKey('OpenSSH')
+        # self.public_key_PEM = self.key.publickey().exportKey('OpenSSH')
+        self.private_key_PEM = self.key.exportKey()
+        self.public_key_PEM = self.key.publickey().exportKey()
     
     def encrypt(self, data):
         cipher = PKCS1_OAEP.new(self.key)

