@@ -1,5 +1,6 @@
 **/a.out
 app/app
+app/ransomware_detector
 **/*.o
 
 encryption_zone/files2encrypt
