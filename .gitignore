@@ -6,3 +6,5 @@ encryption_zone/files2encrypt
 app/test_files
 app/log.txt
 settings.json
+c_cpp_properties.json
+.vscode/

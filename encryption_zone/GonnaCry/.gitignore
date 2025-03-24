@@ -1,0 +1,8 @@
+venvgonnacrysandbox/
+rsa_test_keys/
+build/
+dist/
+decryptor.spec
+gonnacry.spec
+files2encrypt/
+__pycache__
