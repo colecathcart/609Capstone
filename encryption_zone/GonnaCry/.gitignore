@@ -1,2 +1,6 @@
 venvgonnacrysandbox/
 rsa_test_keys/
+build/
+dist/
+decryptor.spec
+gonnacry.spec

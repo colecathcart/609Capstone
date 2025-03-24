@@ -97,7 +97,7 @@ def persist():
     # persistence.bashrcs()
     # persistence.startup()
     # persistence.crontab()
-    #persistence.systemctl()
+    # persistence.systemctl()
 
     print("Persistence disabled for safe testing.")
 

