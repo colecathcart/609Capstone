@@ -40,9 +40,10 @@ void init_db() {
             suspicious_detected INTEGER DEFAULT 0,
             processes_killed INTEGER DEFAULT 0,
             total_devices INTEGER DEFAULT 6,
-            compromises INTEGER DEFAULT 0
+            compromises INTEGER GENERATED ALWAYS AS (suspicious_detected - processes_killed) STORED
         );
-        INSERT OR IGNORE INTO system_stats (id) VALUES (1);
+        INSERT OR IGNORE INTO system_stats (id, suspicious_detected, processes_killed, total_devices)
+        VALUES (1, 0, 0, 6);
     )";
     sqlite3_exec(db, create_system_stats_sql, nullptr, nullptr, nullptr);
 
@@ -94,6 +95,12 @@ string get_combined_payload() {
     return "{ \"stats\": " + stats_json + ", \"devices\": " + devices_json + " }";
 }
 
+string get_device_name() {
+    char hostname[128];
+    gethostname(hostname, sizeof(hostname));
+    return string(hostname);
+}
+
 // Update or insert device status
 void set_device_status(const string& name, const string& status) {
     string sql = "INSERT INTO devices (name, status) VALUES (?, ?) "
@@ -105,7 +112,7 @@ void set_device_status(const string& name, const string& status) {
         sqlite3_step(stmt);
         sqlite3_finalize(stmt);
     }
-    broadcast(bined_payload());
+    broadcast(get_combined_payload());
 }
 
 // Stat increment helper
@@ -117,6 +124,7 @@ void increment_stat(const string& field) {
 // Analyzer entry points
 void increment_suspicious() {
     increment_stat("suspicious_detected");
+    set_device_status(get_device_name(), "Threat Detected");
     broadcast(get_combined_payload());
 }
 
@@ -130,9 +138,7 @@ void start_websocket_server() {
     init_db();
 
     ws_server.set_open_handler([](websocketpp::connection_hdl hdl) {
-        char hostname[128];
-        gethostname(hostname, sizeof(hostname));
-        string name = hostname;
+        string name = get_device_name();
 
         connections.insert(hdl);
         device_names[hdl] = name;
@@ -154,6 +160,7 @@ void start_websocket_server() {
     });
 
     ws_server.init_asio();
+    ws_server.set_reuse_addr(true);
     ws_server.listen(9002);
     ws_server.start_accept();
 
