@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Monitor, ShieldCheck, ShieldAlert, ShieldX, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import useWebSocket from "../hooks/useWebSocket";
+import { useMemo } from "react";
 
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
@@ -11,6 +13,9 @@ import DetectedRansomwareTable from "../components/overview/DetectedRansomwareTa
 const OverviewPage = () => {
 	const navigate = useNavigate();
 	const [dropdownOpen, setDropdownOpen] = useState(false);
+	const wsData = useWebSocket("ws://localhost:9002");
+	const stats = useMemo(() => wsData?.stats || {}, [wsData]);
+	const devices = useMemo(() => wsData?.devices || [], [wsData]);
 
 	const handleLogout = () => {
 		navigate("/");
@@ -51,15 +56,15 @@ const OverviewPage = () => {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 1 }}
 				>
-					<StatCard name="Threats Detected" icon={ShieldAlert} value="450" color="rgb(73, 130, 216)" />
-					<StatCard name="Processes Killed" icon={ShieldCheck} value="400" color="rgb(73, 130, 216)" />
-					<StatCard name="Devices" icon={Monitor} value="6" color="rgb(73, 130, 216)" />
-					<StatCard name="Compromises" icon={ShieldX} value="50" color="rgb(73, 130, 216)" />
+					<StatCard name="Threats Detected" icon={ShieldAlert} value={stats.suspiciousDetected || 0} color="rgb(73, 130, 216)" />
+					<StatCard name="Processes Killed" icon={ShieldCheck} value={stats.processesKilled || 0} color="rgb(73, 130, 216)" />
+					<StatCard name="Devices" icon={Monitor} value={stats.totalDevices || 0} color="rgb(73, 130, 216)" />
+					<StatCard name="Compromises" icon={ShieldX} value={stats.compromises || 0} color="rgb(73, 130, 216)" />
 				</motion.div>
 
 				{/* CHARTS */}
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-					<ClientGrid />
+					<ClientGrid clients={devices}/>
 					<DetectedRansomwareTable />
 				</div>
 			</main>

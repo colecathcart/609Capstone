@@ -1,7 +1,7 @@
 all: ransomware_detector
 
-ransomware_detector: main.o entropy_calculator.o file_extension_checker.o event.o event_detector.o analyzer.o process_killer.o logger.o
-	g++ -Wall main.o entropy_calculator.o file_extension_checker.o event.o event_detector.o analyzer.o process_killer.o logger.o -lmagic -o ransomware_detector
+ransomware_detector: main.o entropy_calculator.o file_extension_checker.o event.o event_detector.o analyzer.o process_killer.o logger.o websocket_server.o
+	g++ -Wall main.o entropy_calculator.o file_extension_checker.o event.o event_detector.o analyzer.o process_killer.o logger.o websocket_server.o -lmagic -lsqlite3 -o ransomware_detector
 
 main.o: src/main.cpp 
 	g++ -Wall -Iinclude -c src/main.cpp
@@ -26,6 +26,9 @@ process_killer.o: src/process_killer.cpp
 
 logger.o: src/logger.cpp
 	g++ -Wall -Iinclude -c src/logger.cpp
+
+websocket_server.o: src/websocket_server.cpp
+	g++ -Wall -Iinclude  -Ithird_party/websocketpp -c src/websocket_server.cpp
 
 test: tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp src/event_detector.cpp src/event.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp
 	g++ -Wall -Iinclude tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp src/event_detector.cpp src/event.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp -lgtest -pthread -lmagic -o test_app

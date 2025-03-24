@@ -2,15 +2,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import QuarantineModal from "./QuarantineModal";
 
-const CLIENT_STATUS = [
-  { name: "David", status: "Offline" },
-  { name: "Cole", status: "Online" },
-  { name: "Rana", status: "Online" },
-  { name: "Destin", status: "Threat Detected" },
-  { name: "Louis", status: "Disconnected" },
-  { name: "Yves", status: "Disconnected" },
-];
-
 const statusColors = {
   "Threat Detected": "bg-red-800",
   Online: "bg-yellow-700",
@@ -18,7 +9,7 @@ const statusColors = {
   Disconnected: "bg-gray-800",
 };
 
-const ClientGrid = () => {
+const ClientGrid = ({ clients }) => {
   const [selectedDevice, setSelectedDevice] = useState(null);
 
   return (
@@ -31,11 +22,11 @@ const ClientGrid = () => {
       <h2 className="text-xl font-semibold mb-4 text-gray-100">Device Status</h2>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto max-h-72">
-        {CLIENT_STATUS.map((client, index) => (
+        {clients.map((client, index) => (
           <div
             key={index}
             className={`rounded-xl p-4 flex flex-col justify-center shadow-md ${
-              statusColors[client.status]
+              statusColors[client.status] || "bg-gray-700"
             } bg-gradient-to-br from-white/5 to-transparent ${
               client.status === "Threat Detected"
                 ? "cursor-pointer hover:ring-2 hover:ring-white transition"
