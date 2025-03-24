@@ -48,12 +48,12 @@ GonnaCry requires the pycrypto library and requests, installation below
 - [x] encrypt all user files with AES-256-CBC.
 - [x] Random AES key and IV for each file.
 - [x] Works even without internet connection.
-- [x] Communication with the server to decrypt Client-private-key.
+- [] Communication with the server to decrypt Client-private-key.
 - [x] encrypt AES key with client-public-key RSA-2048.
 - [x] encrypt client-private-key with RSA-2048 server-public-key.
-- [x] Change computer wallpaper -> Gnome, LXDE, KDE, XFCE.
-- [x] Decryptor that communicate to server to send keys.
-- [x] python webserver
+- [x] Change computer wallpaper -> Gnome, Unity, LXDE, KDE, XFCE.
+- [x] Decryptor that simulate communication to server to send keys and decrypt files.
+- [] python webserver
 - [x] Daemon
 - [ ] Dropper
 
@@ -64,7 +64,7 @@ GonnaCry requires the pycrypto library and requests, installation below
 | main.py      | GonnaCry start file|
 | daemon.py     | dropped by main.py and run |
 | dropper.py    | drop the malware on the computer |
-| decryptor.py  | communicate with the server, decrypt keys and files|
+| decryptor.py  | communicate with the server (simulated), decrypt keys and files|
 | symmetric.py      |AES encryption|
 | asymmetric.py | RSA encryption |
 | generate_keys.py | Generate random AES keys|
