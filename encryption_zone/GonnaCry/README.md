@@ -2,7 +2,7 @@
 
 This directory contains the Python *adapted* code of the GonnaCry ransomware
 
-**Be aware running GonnaCry/main.py GonnaCry/dist/gonnacry in your computer, it may harm.**
+**Be aware running GonnaCry/main.py or GonnaCry/dist/gonnacry in your computer may cause harm. Always use a VM with a snapshot backup.**
 
 # How this version works:
 
@@ -21,12 +21,18 @@ Decryptor try to communicate to server to send the Client private key wich is en
 Ensure you have navigated into encryption_zone/GonnaCry directory before executing any of the code below
 
 Before installing the pycrypto library and requests, a virtual python environment is required for Virtual Machine:
+    ```
     python3 -m venv venvgonnacrysandbox
     source venvgonnacrysandbox/bin/activate
+    ```
 
 GonnaCry requires the pycrypto library and requests, installation below
 
     ~$ pip install -r requirements.txt
+
+You may also need to install pyinstaller:
+
+    `~$ pip install pyinstaller`
 
 # Compiling the code
 
@@ -35,7 +41,7 @@ GonnaCry requires the pycrypto library and requests, installation below
     ~$ pyinstaller -F --clean decryptor.py -n decryptor
 
 # Running the code
-    Ensure you unzip files2encrypt.zip inside encryption_zone/GonnaCry directory and navigate there with your terminal
+    Ensure you unzip files2encrypt.zip **inside** encryption_zone/GonnaCry directory and navigate there with your terminal
     You can run the code by directly running main.py to encrypt all files in files2encrypt/
     or
     ~$ dist/gonnacry
