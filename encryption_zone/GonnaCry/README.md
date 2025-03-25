@@ -18,37 +18,41 @@ Decryptor try to communicate to server to send the Client private key wich is en
 
 # Requirements 
 
-Ensure you have navigated into encryption_zone/GonnaCry directory before executing any of the code below
+Ensure you have navigated into encryption_zone/GonnaCry directory before executing any of the code below:
 
 Before installing the pycrypto library and requests, a virtual python environment is required for Virtual Machine:
-    ```
+   
+    
     python3 -m venv venvgonnacrysandbox
+    
     source venvgonnacrysandbox/bin/activate
-    ```
+    
 
 GonnaCry requires the pycrypto library and requests, installation below
 
-    ~$ pip install -r requirements.txt
+    pip install -r requirements.txt
 
 You may also need to install pyinstaller:
 
-    `~$ pip install pyinstaller`
+    pip install pyinstaller
 
 # Compiling the code
 
-    ~$ pyinstaller -F --clean main.py -n gonnacry
+    pyinstaller -F --clean main.py -n gonnacry
 
-    ~$ pyinstaller -F --clean decryptor.py -n decryptor
+    pyinstaller -F --clean decryptor.py -n decryptor
 
 # Running the code
-    Ensure you unzip files2encrypt.zip **inside** encryption_zone/GonnaCry directory and navigate there with your terminal
-    You can run the code by directly running main.py to encrypt all files in files2encrypt/
+Ensure you unzip files2encrypt.zip **inside** encryption_zone/GonnaCry directory and navigate there with your terminal.
+To encrypt all files in files2encrypt:
+    
+    You can run the code by directly running main.py
     or
-    ~$ dist/gonnacry
+    dist/gonnacry
 
     You can decrypt your files by running decryptor.py
     or
-    ~$ dist/decryptor
+    dist/decryptor
 
 # Objectives:
 - [x] encrypt all user files with AES-256-CBC.
