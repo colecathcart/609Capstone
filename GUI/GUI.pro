@@ -9,13 +9,26 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    adddirectorytowhitelistdialog.cpp \
+    addexetowhitelistdialog.cpp \
+    detectormanager.cpp \
+    logreader.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    systemmonitor.cpp
 
 HEADERS += \
-    mainwindow.h
+    adddirectorytowhitelistdialog.h \
+    addexetowhitelistdialog.h \
+    detectormanager.h \
+    logreader.h \
+    mainwindow.h \
+    systemmonitor.h \
+    systemobserver.h
 
 FORMS += \
+    adddirectorytowhitelistdialog.ui \
+    addexetowhitelistdialog.ui \
     mainwindow.ui
 
 # Default rules for deployment.

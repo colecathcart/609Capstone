@@ -11,7 +11,7 @@ SRC = src/main.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp src
 OBJ = $(SRC:src/%.cpp=%.o)
 
 # Target executables
-APP = app
+APP = ransomware_detector
 TEST_APP = test_app
 
 # Default target
