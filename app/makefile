@@ -41,7 +41,7 @@ test: tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_exte
 	sudo ./test_app
 
 remove:
-	rm -f *.o app test_app websocket_server_app
+	rm -f *.o app test_app 
 
 without_objects:
 	rm -f *.o
