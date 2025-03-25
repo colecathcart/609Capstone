@@ -12,7 +12,7 @@ typedef unsigned char BYTE;
 
 using namespace std;
 
-EntropyCalculator::EntropyCalculator(): buffer_size(8 * 1024) {
+EntropyCalculator::EntropyCalculator(): buffer_size(1024) {
     logger = Logger::getInstance();
 }
 
@@ -68,7 +68,7 @@ bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) c
         double probability = static_cast<double>(pair.second) / total_bytes;
         entropy -= probability * log2(probability);
     }
-    return entropy;
+    return entropy > 7.5;
 }
 
 bool EntropyCalculator::monobit_test(const string& filepath, int hits) const {

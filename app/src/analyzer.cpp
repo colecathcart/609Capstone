@@ -86,7 +86,7 @@ void Analyzer::analyze(Event& event)
     }
 
     int num_hits = update_watch(event.get_pid());
-    logger->log("Process " + to_string(event.get_pid()) + "has been seen " + to_string(num_hits) + "times");
+    logger->log("Process " + to_string(event.get_pid()) + " has been seen " + to_string(num_hits) + " times");
 
     if(file_checker.needs_monobit(event.get_filepath())) {
         if(calculator.monobit_test(event.get_filepath(), num_hits)) {

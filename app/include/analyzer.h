@@ -45,6 +45,7 @@ class Analyzer
             int hits;
         
             Process(uint64_t start_time, int num_hits) : time(start_time), hits(num_hits) {}
+            Process() : time(0), hits(0) {}
         };
 
         /**

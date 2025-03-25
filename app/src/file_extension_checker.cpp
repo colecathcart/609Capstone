@@ -5,14 +5,10 @@
 using namespace std;
 
 #define WHITELIST_HIGH_ENT "data/whitelist_high_ent.txt"
-#define WHITELIST_DIRS "data/whitelist_dirs.txt"
-#define WHITELIST_PACKAGES "data/whitelist_packages.txt"
 #define BLACKLIST_EXT "data/blacklist_extensions.txt"
 
 // Static variable definitions
 const unordered_set<string> FileExtensionChecker::good_high_ent = load_known_extensions(WHITELIST_HIGH_ENT);
-const unordered_set<string> FileExtensionChecker::good_dirs = load_known_extensions(WHITELIST_DIRS);
-const unordered_set<string> FileExtensionChecker::good_packages = load_known_extensions(WHITELIST_PACKAGES);
 const unordered_set<string> FileExtensionChecker::bad_extensions = load_known_extensions(BLACKLIST_EXT);
 
 unordered_set<string> FileExtensionChecker::load_known_extensions(const string& filename) {
@@ -80,13 +76,5 @@ bool FileExtensionChecker::is_blacklist_extension(const string& filepath) const 
         bool is_file_suspicious = bad_extensions.find(file_extension) != bad_extensions.end();
         return is_file_suspicious;
     }
-    return false;
-}
-
-bool FileExtensionChecker::is_whitelist_dir(const string& dirpath) const {
-    return good_dirs.find(dirpath) != good_dirs.end();
-}
-
-bool FileExtensionChecker::is_whitelist_package(const string& filepath) const {
     return false;
 }
