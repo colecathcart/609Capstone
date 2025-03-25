@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    thread ws_client_thread(connect_to_websocket_host, "WEBSOCKET_URI");
+    thread ws_client_thread(connect_to_websocket_host, WEBSOCKET_URI);
 
     Logger* logger = Logger::getInstance();
     logger->log("Starting detector...");
