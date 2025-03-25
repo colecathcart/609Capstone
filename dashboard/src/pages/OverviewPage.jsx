@@ -13,7 +13,7 @@ import DetectedRansomwareTable from "../components/overview/DetectedRansomwareTa
 const OverviewPage = () => {
 	const navigate = useNavigate();
 	const [dropdownOpen, setDropdownOpen] = useState(false);
-	const wsData = useWebSocket("ws://localhost:9002");
+	const wsData = useWebSocket();
 	const stats = useMemo(() => wsData?.stats || {}, [wsData]);
 	const devices = useMemo(() => wsData?.devices || [], [wsData]);
 

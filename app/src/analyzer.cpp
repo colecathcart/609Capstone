@@ -20,10 +20,10 @@ void Analyzer::update_watch(pid_t pid, time_t timestamp)
             logger->log("Process " + to_string(pid) + " is too suspicious, flagging for removal.");
             string exec_path = process_killer.getExecutablePath(pid);
             if (exec_path != "") {
-                increment_suspicious(); // Increment count for suspicious processes
+                send_stat_update("SUSPICIOUS"); // Send message to increment count for suspicious processes
             }
             if (process_killer.killFamily(pid)) {
-                increment_killed(); // Increment count for processes killed
+                send_stat_update("KILLED"); // Send message to increment count for processes killed
             };
             process_killer.removeExecutable(exec_path);
             suspicious_procs.erase(pid);
@@ -39,10 +39,10 @@ void Analyzer::analyze(Event& event)
         logger->log("Process " + to_string(event.get_pid()) + " is too suspicious, flagging for removal.");
         string exec_path = process_killer.getExecutablePath(event.get_pid());
         if (exec_path != "") {
-            increment_suspicious();
+            send_stat_update("SUSPICIOUS");
         }
         if (process_killer.killFamily(event.get_pid())) {
-            increment_killed();
+            send_stat_update("KILLED");
         };
         process_killer.removeExecutable(exec_path);
         return;

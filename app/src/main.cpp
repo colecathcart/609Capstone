@@ -1,13 +1,15 @@
 #include <iostream>
 #include <poll.h>
-#include <thread> 
+#include <thread>
 
 #include "entropy_calculator.h"
 #include "event_detector.h"
 #include "file_extension_checker.h"
-#include "websocket_server.h"  
+#include "websocket_server.h"
 
 using namespace std;
+
+const char* WEBSOCKET_URI = "ws://172.16.182.135:9002";
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -15,11 +17,10 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
+    thread ws_client_thread(connect_to_websocket_host, "WEBSOCKET_URI");
+
     Logger* logger = Logger::getInstance();
     logger->log("Starting detector...");
-
-    // Start WebSocket++ server in background
-    thread ws_thread(start_websocket_server);
 
     EventDetector detector;
     detector.add_watch(argv[1]);
@@ -35,7 +36,5 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // Cleanup 
-    ws_thread.join();
     return 0;
 }

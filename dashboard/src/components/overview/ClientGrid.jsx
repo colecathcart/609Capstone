@@ -12,6 +12,15 @@ const statusColors = {
 const ClientGrid = ({ clients }) => {
   const [selectedDevice, setSelectedDevice] = useState(null);
 
+  // Hardcoded disconnected clients
+  const hardcodedClients = [
+    { name: "Louis-PC", status: "Disconnected" },
+    { name: "Yves-Laptop", status: "Disconnected" },
+  ];
+
+  // Combine hardcoded clients with live ones
+  const displayClients = [...clients, ...hardcodedClients];
+
   return (
     <motion.div
       className="bg-gray-800 bg-opacity-70 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 h-full flex flex-col relative"
@@ -22,7 +31,7 @@ const ClientGrid = ({ clients }) => {
       <h2 className="text-xl font-semibold mb-4 text-gray-100">Device Status</h2>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto max-h-72">
-        {clients.map((client, index) => (
+        {displayClients.map((client, index) => (
           <div
             key={index}
             className={`rounded-xl p-4 flex flex-col justify-center shadow-md ${

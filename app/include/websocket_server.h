@@ -4,19 +4,22 @@
 #include <string>
 using namespace std;
 
-// Starts the WebSocket++ server 
+// Starts the WebSocket++ server (host mode)
 void start_websocket_server();
 
-// Called when suspicious behavior is detected
-void increment_suspicious();
+// Connects to a WebSocket++ host server (client mode)
+void connect_to_websocket_host(const string& uri);
 
-// Called when a process is removed
-void increment_killed();
+// Called by Analyzer to send stat updates ("SUSPICIOUS" or "KILLED")
+void send_stat_update(const string& type);
 
-// Updates or inserts a device's status (Online/Offline)
-void set_device_status(const std::string& name, const std::string& status);
+// Updates or inserts a device's status (Online, Offline, Threat Detected, etc.)
+void set_device_status(const string& name, const string& status);
 
-// Returns combined JSON payload of stats and device statuses
+// Returns the combined JSON payload of system stats + device statuses
 string get_combined_payload();
 
-#endif
+// Returns the current device hostname
+string get_device_name();
+
+#endif // WEBSOCKET_SERVER_H

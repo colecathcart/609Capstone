@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 
-const useWebSocket = (url) => {
+const useWebSocket = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    const socket = new WebSocket(url);
+
+    const socket = new WebSocket(import.meta.env.VITE_WEBSOCKET_URI);
 
     socket.onmessage = (event) => {
       try {
@@ -17,7 +18,7 @@ const useWebSocket = (url) => {
 
     socket.onerror = (err) => console.error("WebSocket error:", err);
     return () => socket.close();
-  }, [url]);
+  }, []);
 
   return data;
 };
