@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Give system/network a moment to stabilize
-    this_thread::sleep_for(std::chrono::milliseconds(500));
+    this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     thread ws_client_thread(connect_to_websocket_host, WEBSOCKET_URI);
 
