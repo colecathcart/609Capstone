@@ -4,6 +4,12 @@
 #include <cerrno>
 
 LogReader::LogReader() {
+
+    attr.mq_flags = 0;
+    attr.mq_maxmsg = 100;
+    attr.mq_msgsize = MAX_SIZE;
+    attr.mq_curmsgs = 0;
+
     mq = mq_open(QUEUE_NAME, O_CREAT | O_RDONLY | O_NONBLOCK, 0666, &attr);
     if (mq == (mqd_t)-1) {
         qWarning() << "Failed to open message queue: " << strerror(errno);
