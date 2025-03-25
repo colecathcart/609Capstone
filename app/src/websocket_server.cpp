@@ -197,6 +197,10 @@ void start_websocket_server() {
 void connect_to_websocket_host(const string& uri) {
     is_client_mode = true;
 
+    // Enable detailed logging
+    ws_client.set_access_channels(websocketpp::log::alevel::all);
+    ws_client.clear_access_channels(websocketpp::log::alevel::frame_payload);
+
     ws_client.init_asio();
     ws_client.set_open_handler([&](websocketpp::connection_hdl hdl) {
         client_hdl = hdl;

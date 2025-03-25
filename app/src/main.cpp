@@ -17,6 +17,9 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
+    // Give system/network a moment to stabilize
+    this_thread::sleep_for(std::chrono::milliseconds(500));
+
     thread ws_client_thread(connect_to_websocket_host, WEBSOCKET_URI);
 
     Logger* logger = Logger::getInstance();
