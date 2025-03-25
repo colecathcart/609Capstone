@@ -8,6 +8,7 @@
 #include "file_extension_checker.h"
 #include "process_killer.h"
 #include <cstdint>
+#include <tuple>
 
 using namespace std;
 
@@ -26,8 +27,8 @@ class Analyzer
         Analyzer();
 
         /**
-         * @brief Analyzes the given event, storing the process id and timestamp
-         * internally if deemed suspicious.
+         * @brief Analyzes the given event, storing the process id, creation time and
+         * number of times that process has been seen.
          * @param event The event to be analyzed
          */
         void analyze(Event& event);
@@ -35,19 +36,21 @@ class Analyzer
     private:
 
         /**
-         * @brief A map holding identified suspicious processes
+         * @brief Struct for holding process info for process tracking
+         * @param time The start time of the process
+         * @param hits The number of times this process has been seen
          */
-        unordered_map<pid_t, time_t> suspicious_procs;
+        struct Process {
+            uint64_t time;
+            int hits;
+        
+            Process(uint64_t start_time, int num_hits) : time(start_time), hits(num_hits) {}
+        };
 
         /**
-         * @brief A map holding trusted procs with their creation time in clock ticks
+         * @brief A map holding trusted procs with their creation time and number of hits
          */
-        unordered_map<pid_t, uint64_t> safe_procs;
-
-        /**
-         * @brief A set holding safe or whitelisted packages
-         */
-        unordered_set<string> safe_packages;
+        unordered_map<pid_t, Process> watched_procs;
 
         /**
          * @brief An instance of EntropyCalculator for determining encryption
@@ -70,16 +73,10 @@ class Analyzer
         Logger* logger;
 
         /**
-         * @brief Helper function to update suspicious_procs and take action if required
+         * @brief Function to update the process watchlist for the given pid
+         * @return The number of times this process has been seen.
          */
-        void update_watch(pid_t pid, time_t timestamp);
-
-        /**
-         * @brief Logic to determine if a process is trusted, or previously trusted, and update
-         * the safe_procs map accordingly
-         * @param pid the process ID to check
-         */
-        bool is_trusted_process(pid_t pid);
+        int update_watch(pid_t pid);
 
         /**
          * @brief Helper function to save hash to a file

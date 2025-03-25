@@ -37,7 +37,7 @@ bool EntropyCalculator::is_small_file(const string& filepath) const {
     return false;
 }
 
-double EntropyCalculator::get_shannon_entropy(const string& filepath) const {
+bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) const {
     
     if(is_small_file(filepath)) {
         return 0;
@@ -71,7 +71,7 @@ double EntropyCalculator::get_shannon_entropy(const string& filepath) const {
     return entropy;
 }
 
-bool EntropyCalculator::monobit_test(const string& filepath) const {
+bool EntropyCalculator::monobit_test(const string& filepath, int hits) const {
 
      if(is_small_file(filepath)) {
         return false;
