@@ -184,6 +184,10 @@ void start_websocket_server() {
     init_db();
 
     ws_server.set_open_handler([](websocketpp::connection_hdl hdl) {
+        string name = get_device_name();
+        connections.insert(hdl);
+        device_names[hdl] = name;
+        set_device_status(name, "Online");
         ws_server.send(hdl, get_combined_payload(), websocketpp::frame::opcode::text);
     });
 
