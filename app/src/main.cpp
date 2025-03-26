@@ -17,6 +17,11 @@ int main(int argc, char* argv[]) {
     Logger* logger = Logger::getInstance();
     logger->log("Starting detector...");
 
+    EntropyCalculator calc;
+    cout << "starting test" << endl;
+    calc.calc_shannon_entropy("/home/vm/Desktop/vscode/609Capstone/encryption_zone/test6.zip.GNNCRY", 1);
+    calc.calc_shannon_entropy("/home/vm/Desktop/vscode/609Capstone/encryption_zone/decoded.txt", 1);
+
     EventDetector detector;
     detector.add_watch(argv[1]);
 

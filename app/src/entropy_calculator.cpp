@@ -8,9 +8,19 @@
 #include <sstream>
 #include <iomanip>
 
+#define MEGABYTE 1024 * 1024
+#define KILOBYTE 1024
+
 typedef unsigned char BYTE;
 
 using namespace std;
+
+static const unordered_set<BYTE> base64_set = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+    'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+    'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+    'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/', '='
+};
 
 EntropyCalculator::EntropyCalculator(): buffer_size(1024) {
     logger = Logger::getInstance();
@@ -37,12 +47,35 @@ bool EntropyCalculator::is_small_file(const string& filepath) const {
     return false;
 }
 
+vector<BYTE> EntropyCalculator::decode(vector<BYTE>& buffer, size_t length){
+    int to_count = min(100, (int)length);
+    for(int i = 0; i < to_count; i++) {
+        if(base64_set.find(buffer[i]) == base64_set.end()) {
+            return buffer;
+        }
+    }
+
+    BIO *bio, *base64;
+    int decode_len = static_cast<int>(buffer.size());
+    vector<BYTE> decoded_buffer(decode_len);
+
+    base64 = BIO_new(BIO_f_base64());
+    bio = BIO_new_mem_buf(buffer.data(), decode_len);
+    bio = BIO_push(base64, bio);
+
+    int length = BIO_read(bio, decoded_buffer.data(), decode_len);
+    decoded_buffer.resize(length);
+
+    return decoded_buffer;
+
+}
+
 bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) const {
     
     if(is_small_file(filepath)) {
-        return 0;
+        return false;
     }
-    
+
     ifstream file(filepath, ios::binary);
     
     if (!file.is_open()) {
@@ -50,25 +83,60 @@ bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) c
         return -1;
     }
 
-    unordered_map<BYTE, size_t> frequencies;
-    vector<BYTE> buffer(buffer_size);
-    size_t total_bytes = 0;
+    int mbs_to_read = 0;
+    switch (hits)
+    {
+    case 1:
+        mbs_to_read = 1;
+        break;
+    case 2:
+        mbs_to_read = 10;
+        break;
+    case 3:
+        mbs_to_read = 20;
+        break;
+    case 4:
+        mbs_to_read = 50;
+        break;
+    default:
+        mbs_to_read = 100;
+        break;
+    }
 
-    while (file.read(reinterpret_cast<char*>(buffer.data()), buffer_size) || file.gcount() > 0) {
+    unordered_map<BYTE, size_t> frequencies;
+    vector<BYTE> buffer(MEGABYTE);
+    size_t total_bytes_read = 0;
+    size_t bytes_to_read = mbs_to_read * MEGABYTE;
+
+
+    while (file.read(reinterpret_cast<char*>(buffer.data()), buffer.size())) {
         size_t bytes_read = file.gcount();
-        total_bytes += bytes_read;
-        for (size_t i = 0; i < bytes_read; i++){
+        total_bytes_read += bytes_read;
+        
+        if (bytes_read < KILOBYTE) {
+            continue;
+        }
+
+        for (size_t i = 0; i < bytes_read; i++) {
             frequencies[buffer[i]]++;
         }
+
+        double entropy = 0.0;
+        for(const auto& pair : frequencies) {
+            double probability = static_cast<double>(pair.second) / bytes_read;
+            entropy -= probability * log2(probability);
+        }
+
+        cout << entropy << endl;
+        if (entropy > 7.5) {
+            file.close();
+            return true;
+        }
+
+        frequencies.clear();
     }
     file.close();
-
-    double entropy = 0.0;
-    for(const auto& pair : frequencies) {
-        double probability = static_cast<double>(pair.second) / total_bytes;
-        entropy -= probability * log2(probability);
-    }
-    return entropy > 7.5;
+    return false;
 }
 
 bool EntropyCalculator::monobit_test(const string& filepath, int hits) const {
@@ -114,10 +182,12 @@ bool EntropyCalculator::monobit_test(const string& filepath, int hits) const {
 
         if(p_value >= 0.01) {
             num_passed_blocks++;
-        }
+        } 
     }
 
     file.close();
+
+    cout << num_passed_blocks << " / " << num_blocks << " blocks passed" << endl;
 
     if (num_passed_blocks / num_blocks >= 0.9) {
         return true;

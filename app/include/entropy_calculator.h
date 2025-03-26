@@ -3,6 +3,9 @@
 
 #include <string>
 #include "logger.h"
+#include <unordered_set>
+
+typedef unsigned char BYTE;
 
 using namespace std;
 
@@ -57,6 +60,10 @@ class EntropyCalculator
          */
         const size_t buffer_size;
         /**
+         * @brief All valid base64 characters for checking encoding
+         */
+        static const unordered_set<char> base64_set;
+        /**
          * @brief Reference to singleton logger
          */
         Logger* logger;
@@ -64,7 +71,10 @@ class EntropyCalculator
          * @brief Helper function to ignore small files (< 1 KB)
          */
         bool is_small_file(const string& filepath) const;
-
+        /**
+         * @brief Helper function to check for and perform decoding in base64
+         */
+        vector<BYTE> decode(vector<BYTE>& buffer, size_t length);
 };
 
 #endif
