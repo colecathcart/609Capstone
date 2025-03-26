@@ -8,6 +8,7 @@
 #include <iostream>
 #include <set>
 #include <map>
+#include <string>
 
 using namespace std;
 
@@ -59,11 +60,11 @@ void init_db() {
             id INTEGER PRIMARY KEY CHECK (id = 1),
             suspicious_detected INTEGER DEFAULT 0,
             processes_killed INTEGER DEFAULT 0,
-            total_devices INTEGER DEFAULT 6,
+            total_devices INTEGER DEFAULT 2,
             compromises INTEGER GENERATED ALWAYS AS (suspicious_detected - processes_killed) STORED
         );
         INSERT OR IGNORE INTO system_stats (id, suspicious_detected, processes_killed, total_devices)
-        VALUES (1, 0, 0, 6);
+        VALUES (1, 0, 0, 2);
     )";
 
     const char* create_devices = R"(
@@ -83,7 +84,8 @@ string get_combined_payload() {
     string stats_json = "{";
     string query_stats = "SELECT suspicious_detected, processes_killed, total_devices, compromises FROM system_stats WHERE id=1";
 
-    if (sqlite3_prepare_v2(db, query_stats.c_str(), -1, &stmt, nullptr) == SQLITE_OK && sqlite3_step(stmt) == SQLITE_ROW) {
+    if (sqlite3_prepare_v2(db, query_stats.c_str(), -1, &stmt, nullptr) == SQLITE_OK &&
+        sqlite3_step(stmt) == SQLITE_ROW) {
         stats_json += "\"suspiciousDetected\": " + to_string(sqlite3_column_int(stmt, 0)) + ",";
         stats_json += "\"processesKilled\": " + to_string(sqlite3_column_int(stmt, 1)) + ",";
         stats_json += "\"totalDevices\": " + to_string(sqlite3_column_int(stmt, 2)) + ",";
@@ -134,6 +136,33 @@ void increment_stat(const string& field) {
     sqlite3_exec(db, sql.c_str(), nullptr, nullptr, nullptr);
 }
 
+// Register a new device if this is the first time the connection sends its hostname
+void register_new_device(websocketpp::connection_hdl hdl, const string& name) {
+    connections.insert(hdl);
+    device_names[hdl] = name;
+
+    // Check if device is new (i.e. not in the database)
+    sqlite3_stmt* stmt;
+    string check_sql = "SELECT COUNT(*) FROM devices WHERE name = ?";
+    bool is_new_device = false;
+
+    if (sqlite3_prepare_v2(db, check_sql.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
+        if (sqlite3_step(stmt) == SQLITE_ROW && sqlite3_column_int(stmt, 0) == 0) {
+            is_new_device = true;
+        }
+        sqlite3_finalize(stmt);
+    }
+
+    // Set device status as Online and update total_devices if new
+    set_device_status(name, "Online");
+    if (is_new_device) {
+        increment_stat("total_devices");
+    }
+
+    broadcast(get_combined_payload());
+}
+
 // Shared entry point: called by Analyzer when suspicious/killed
 void send_stat_update(const string& type) {
     if (is_client_mode && connected) {
@@ -155,22 +184,29 @@ void start_websocket_server() {
     init_db();
 
     ws_server.set_open_handler([](websocketpp::connection_hdl hdl) {
-        string name = get_device_name();
-        connections.insert(hdl);
-        device_names[hdl] = name;
-        set_device_status(name, "Online");
         ws_server.send(hdl, get_combined_payload(), websocketpp::frame::opcode::text);
     });
 
     ws_server.set_close_handler([](websocketpp::connection_hdl hdl) {
         string name = device_names[hdl];
-        set_device_status(name, "Offline");
+        if (!name.empty()) {
+            set_device_status(name, "Offline");
+        }
         connections.erase(hdl);
         device_names.erase(hdl);
     });
 
     ws_server.set_message_handler([](websocketpp::connection_hdl hdl, server::message_ptr msg) {
-        string type = msg->get_payload();
+        string payload = msg->get_payload();
+
+        // If the device is not registered yet, treat this as its initial message containing the hostname.
+        if (device_names.find(hdl) == device_names.end()) {
+            register_new_device(hdl, payload);
+            return;
+        }
+
+        // Otherwise, handle commands (e.g., "SUSPICIOUS" or "KILLED")
+        string type = payload;
         string name = device_names[hdl];
 
         if (type == "SUSPICIOUS") {
@@ -188,7 +224,7 @@ void start_websocket_server() {
     ws_server.listen(WEBSOCKET_PORT);
     ws_server.start_accept();
 
-    cout << "[WebSocket] Host running on port 9002\n";
+    cout << "[WebSocket] Host running on port " << WEBSOCKET_PORT << "\n";
     ws_server.run();
     sqlite3_close(db);
 }
@@ -206,6 +242,10 @@ void connect_to_websocket_host(const string& uri) {
         client_hdl = hdl;
         connected = true;
         cout << "[WebSocket] Connected to host.\n";
+
+        // Send hostname to host as the initial message
+        string hostname = get_device_name();
+        ws_client.send(hdl, hostname, websocketpp::frame::opcode::text);
     });
 
     ws_client.set_message_handler([](websocketpp::connection_hdl, message_ptr msg) {
