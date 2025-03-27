@@ -18,8 +18,8 @@ MainWindow::MainWindow(QWidget *parent):
 
     this->isOn = false;
 
-
-
+    ui->denylistExeList->setModel(listManager->getDenyListExtensionModel());
+    ui->whitelistDirectoryList->setModel(listManager->getAllowListDirectoryModel());
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::fetchData);

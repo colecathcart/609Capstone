@@ -110,3 +110,12 @@ void AllowListAndDenyListManager::saveToFile(const QString &filePath, QStringLis
         qWarning() << "Could not open" << filePath << "for writing.";
     }
 }
+
+// --------- Getters ----------
+QStringListModel* AllowListAndDenyListManager::getDenyListExtensionModel() const {
+    return denyListExtensionsModel;
+}
+
+QStringListModel* AllowListAndDenyListManager::getAllowListDirectoryModel() const {
+    return allowListDirectoriesModel;
+}
