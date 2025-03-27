@@ -98,3 +98,34 @@ void MainWindow::on_newExeButton_released()
     denylistDialog.exec();
 }
 
+
+void MainWindow::on_removeDirectoryButton_released()
+{
+    // Get the selected index from the QListView
+    QModelIndex selectedIndex = ui->whitelistDirectoryList->selectionModel()->currentIndex();
+
+    if (selectedIndex.isValid()) {
+        // Get the selected directory from the model
+        QString selectedDirectory = selectedIndex.data().toString();
+
+        // Remove the selected directory using the manager
+        listManager->removeAllowListDirectory(selectedDirectory);
+    }
+}
+
+
+void MainWindow::on_removeExeButton_released()
+{
+    // Get the selected index from the QListView
+    QModelIndex selectedIndex = ui->denylistExeList->selectionModel()->currentIndex();
+
+    if (selectedIndex.isValid()) {
+        // Get the selected directory from the model
+        QString selectedExtension = selectedIndex.data().toString();
+
+        // Remove the selected directory using the manager
+        listManager->removeDenyListExtension(selectedExtension);
+    }
+
+}
+

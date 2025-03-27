@@ -34,6 +34,10 @@ private slots:
 
     void on_newExeButton_released();
 
+    void on_removeDirectoryButton_released();
+
+    void on_removeExeButton_released();
+
 private:
     Ui::MainWindow *ui;
     SystemMonitor *monitor;

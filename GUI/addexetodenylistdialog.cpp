@@ -15,6 +15,11 @@ addExeToDenylistDialog::~addExeToDenylistDialog()
 
 void addExeToDenylistDialog::on_exeDenylistDialogButtons_accepted()
 {
+    QString newExtension = ui->lineEdit->text().trimmed();
+
+    if (!newExtension.isEmpty()) {
+        listManager->addDenyListExtension(newExtension);
+    }
 
 }
 

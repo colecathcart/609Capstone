@@ -16,6 +16,9 @@ public:
     explicit AddDirectoryToWhitelistDialog(QWidget *parent = nullptr, AllowListAndDenyListManager* manager = nullptr);
     ~AddDirectoryToWhitelistDialog();
 
+private slots:
+    void on_whitelistDirectoryButtons_accepted();
+
 private:
     AllowListAndDenyListManager* listManager;
     Ui::AddDirectoryToWhitelistDialog *ui;

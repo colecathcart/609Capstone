@@ -12,3 +12,13 @@ AddDirectoryToWhitelistDialog::~AddDirectoryToWhitelistDialog()
 {
     delete ui;
 }
+
+void AddDirectoryToWhitelistDialog::on_whitelistDirectoryButtons_accepted()
+{
+    QString newDir = ui->directoryPath->text().trimmed();
+
+    if (!newDir.isEmpty()) {
+        listManager->addAllowListDirectory(newDir);
+    }
+}
+
