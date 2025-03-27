@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>addExeToWhitelistDialog</class>
- <widget class="QDialog" name="addExeToWhitelistDialog">
+ <class>addExeToDenylistDialog</class>
+ <widget class="QDialog" name="addExeToDenylistDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -482,7 +482,7 @@
   <property name="windowTitle">
    <string>Whitelist Executable</string>
   </property>
-  <widget class="QDialogButtonBox" name="exeWhitelistDialogButtons">
+  <widget class="QDialogButtonBox" name="exeDenylistDialogButtons">
    <property name="geometry">
     <rect>
      <x>40</x>
@@ -521,7 +521,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:700; color:#ffffff;&quot;&gt;Enter full path to desired executable:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QPlainTextEdit" name="exeToWhitelist">
+  <widget class="QPlainTextEdit" name="exeToDenylist">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -541,9 +541,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
  <resources/>
  <connections>
   <connection>
-   <sender>exeWhitelistDialogButtons</sender>
+   <sender>exeDenylistDialogButtons</sender>
    <signal>accepted()</signal>
-   <receiver>addExeToWhitelistDialog</receiver>
+   <receiver>addExeToDenylistDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -557,9 +557,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </hints>
   </connection>
   <connection>
-   <sender>exeWhitelistDialogButtons</sender>
+   <sender>exeDenylistDialogButtons</sender>
    <signal>rejected()</signal>
-   <receiver>addExeToWhitelistDialog</receiver>
+   <receiver>addExeToDenylistDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

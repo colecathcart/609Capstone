@@ -23,8 +23,6 @@ public:
 
 
 private slots:
-    void on_newExeButton_clicked();
-
     void on_newDirectoryButton_clicked();
 
     void fetchData();
@@ -32,6 +30,8 @@ private slots:
     void on_startButton_released();
 
     void on_stopButton_released();
+
+    void on_newExeButton_released();
 
 private:
     Ui::MainWindow *ui;
