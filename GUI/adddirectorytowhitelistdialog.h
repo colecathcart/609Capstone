@@ -17,8 +17,8 @@ public:
     ~AddDirectoryToWhitelistDialog();
 
 private:
-    Ui::AddDirectoryToWhitelistDialog *ui;
     AllowListAndDenyListManager* listManager;
+    Ui::AddDirectoryToWhitelistDialog *ui;
 };
 
 #endif // ADDDIRECTORYTOWHITELISTDIALOG_H
