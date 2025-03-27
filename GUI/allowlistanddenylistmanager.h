@@ -2,6 +2,7 @@
 #define ALLOWLISTANDDENYLISTMANAGER_H
 
 #include <QStringList>
+#include <QStringListModel>
 
 #define BLACKLIST_EXTENSIONS_PATH  "../../../app/data/blacklist_extensions.txt"
 #define WHITELIST_DIRS_PATH  "../../../app/data/whitelist_dirs.txt"
@@ -20,10 +21,15 @@ public:
     void removeDenyListExtension(QString removedExtension); // Removes the selected item from the list and .txt file
     void removeAllowListDirectory(QString removedDirectory); // Removes the selected item from the list and .txt file
 
+    QStringListModel* getDenyListExtensionModel() const;
+    QStringListModel* getAllowListDirectoryModel() const;
 
 private:
-    QStringList denyListExtensions;
-    QStringList allowListDirectories;
+    QStringListModel* denyListExtensionsModel;
+    QStringListModel* allowListDirectoriesModel;
+
+    void saveToFile(const QString& filePath, QStringListModel* model);
+
 };
 
 #endif // ALLOWLISTANDDENYLISTMANAGER_H

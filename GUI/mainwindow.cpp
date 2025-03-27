@@ -10,7 +10,8 @@ MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     monitor(new SystemMonitor),
-    detector(new DetectorManager)
+    detector(new DetectorManager),
+    listManager(new AllowListAndDenyListManager)
 {
     ui->setupUi(this);
     monitor->addObserver(this);

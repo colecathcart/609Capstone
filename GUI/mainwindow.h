@@ -5,6 +5,7 @@
 #include <systemmonitor.h>
 #include <systemobserver.h>
 #include <detectormanager.h>
+#include <allowlistanddenylistmanager.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -37,6 +38,7 @@ private:
     Ui::MainWindow *ui;
     SystemMonitor *monitor;
     DetectorManager *detector;
+    AllowListAndDenyListManager *listManager;
     bool isOn;
 };
 #endif // MAINWINDOW_H

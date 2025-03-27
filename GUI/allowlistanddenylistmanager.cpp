@@ -6,6 +6,9 @@
 
 
 AllowListAndDenyListManager::AllowListAndDenyListManager() {
+    denyListExtensionsModel = new QStringListModel(this);
+    allowListDirectoriesModel = new QStringListModel(this);
+
     loadDenyListExtensions();
     loadAllowListDirectories();
 }
@@ -14,113 +17,96 @@ AllowListAndDenyListManager::AllowListAndDenyListManager() {
 void AllowListAndDenyListManager::loadDenyListExtensions() {
     QFile file(BLACKLIST_EXTENSIONS_PATH);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Could not open .txt for reading.";
+        qWarning() << "Could not open" << BLACKLIST_EXTENSIONS_PATH << "for reading.";
         return;
     }
-    denyListExtensions.clear();
+
+    QStringList extensions;
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
         if (!line.isEmpty()) {
-            denyListExtensions << line;
+            extensions.append(line);
         }
     }
     file.close();
-    qDebug() << "Loaded Deny List Extensions:" << denyListExtensions;
+    denyListExtensionsModel->setStringList(extensions);
 }
 
 void AllowListAndDenyListManager::loadAllowListDirectories() {
     QFile file(WHITELIST_DIRS_PATH);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Could not open .txt for reading.";
+        qWarning() << "Could not open" << WHITELIST_DIRS_PATH << "for reading.";
         return;
     }
-    allowListDirectories.clear();
+
+    QStringList dirs;
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
         if (!line.isEmpty()) {
-            allowListDirectories << line;
+            dirs.append(line);
         }
     }
     file.close();
-    qDebug() << "Loaded Allow List Directories:" << allowListDirectories;
+    allowListDirectoriesModel->setStringList(dirs);
 }
 
 // ---------- Add Functions ----------
 void AllowListAndDenyListManager::addDenyListExtension(QString newExtension) {
-    if (!denyListExtensions.contains(newExtension.trimmed())) {
-        denyListExtensions << newExtension.trimmed();
-        QFile file(BLACKLIST_EXTENSIONS_PATH);
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
-            QTextStream out(&file);
-            out << newExtension.trimmed() << "\n";
-            file.close();
-            qDebug() << "Added to Deny List:" << newExtension;
-        } else {
-            qWarning() << "Could not open .txt for writing.";
-        }
+    QStringList currentExtensions = denyListExtensionsModel->stringList();
+    if (!currentExtensions.contains(newExtension.trimmed())) {
+        currentExtensions.append(newExtension.trimmed());
+        denyListExtensionsModel->setStringList(currentExtensions);
+        saveToFile(BLACKLIST_EXTENSIONS_PATH, denyListExtensionsModel);
     } else {
-        qDebug() << "Extension already in Deny List:" << newExtension;
+        qDebug() << "Extension already in list";
     }
 }
 
 void AllowListAndDenyListManager::addAllowListDirectory(QString newDirectory) {
-    if (!allowListDirectories.contains(newDirectory.trimmed())) {
-        allowListDirectories << newDirectory.trimmed();
-        QFile file(WHITELIST_DIRS_PATH);
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
-            QTextStream out(&file);
-            out << newDirectory.trimmed() << "\n";
-            file.close();
-            qDebug() << "Added to Allow List:" << newDirectory;
-        } else {
-            qWarning() << "Could not open .txt for writing.";
-        }
+    QStringList currentDirs = allowListDirectoriesModel->stringList();
+    if (!currentDirs.contains(newDirectory.trimmed())) {
+        currentDirs.append(newDirectory.trimmed());
+        allowListDirectoriesModel->setStringList(currentDirs);
+        saveToFile(WHITELIST_DIRS_PATH, allowListDirectoriesModel);
     } else {
-        qDebug() << "Directory already in Allow List:" << newDirectory;
+        qDebug() << "Directory already in list";
     }
 }
 
 // ---------- Remove Functions ----------
 void AllowListAndDenyListManager::removeDenyListExtension(QString removedExtension) {
-    if (denyListExtensions.isEmpty()) {
-        qWarning() << "No extensions available to remove.";
+    QStringList currentExtensions = denyListExtensionsModel->stringList();
+    if (!currentExtensions.contains(removedExtension)) {
+        qWarning() << "Extension not found.";
         return;
     }
-
-    denyListExtensions.removeAll(removedExtension);
-
-    QFile file(BLACKLIST_EXTENSIONS_PATH);
-    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QTextStream out(&file);
-        for (const QString &ext : denyListExtensions) {
-            out << ext << "\n";
-        }
-        file.close();
-        qDebug() << "Removed from Deny List:" << removedExtension;
-    } else {
-        qWarning() << "Could not open" << BLACKLIST_EXTENSIONS_PATH << "for writing.";
-    }
+    currentExtensions.removeAll(removedExtension);
+    denyListExtensionsModel->setStringList(currentExtensions);
+    saveToFile(BLACKLIST_EXTENSIONS_PATH, denyListExtensionsModel);
 }
 
 void AllowListAndDenyListManager::removeAllowListDirectory(QString removedDirectory) {
-    if (allowListDirectories.isEmpty()) {
-        qWarning() << "No directories available to remove.";
+    QStringList currentDirs = allowListDirectoriesModel->stringList();
+    if (!currentDirs.contains(removedDirectory)) {
+        qWarning() << "Directory not found.";
         return;
     }
+    currentDirs.removeAll(removedDirectory);
+    allowListDirectoriesModel->setStringList(currentDirs);
+    saveToFile(WHITELIST_DIRS_PATH, allowListDirectoriesModel);
+}
 
-    allowListDirectories.removeAll(removedDirectory);
-
-    QFile file(WHITELIST_DIRS_PATH);
+void AllowListAndDenyListManager::saveToFile(const QString &filePath, QStringListModel *model){
+    QFile file(filePath);
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&file);
-        for (const QString &dir : allowListDirectories) {
-            out << dir << "\n";
+        for (const QString &item : model->stringList()) {
+            out << item << "\n";
         }
         file.close();
-        qDebug() << "Removed from Allow List:" << removedDirectory;
     } else {
-        qWarning() << "Could not open" << WHITELIST_DIRS_PATH << "for writing.";
+        qWarning() << "Could not open" << filePath << "for writing.";
     }
 }
