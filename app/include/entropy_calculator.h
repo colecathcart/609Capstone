@@ -3,7 +3,8 @@
 
 #include <string>
 #include "logger.h"
-#include <unordered_set>
+#include <unordered_map>
+#include <vector>
 
 typedef unsigned char BYTE;
 
@@ -62,7 +63,7 @@ class EntropyCalculator
         /**
          * @brief All valid base64 characters for checking encoding
          */
-        static const unordered_set<char> base64_set;
+        static const unordered_map<BYTE, int> base64_set;
         /**
          * @brief Reference to singleton logger
          */
@@ -74,7 +75,7 @@ class EntropyCalculator
         /**
          * @brief Helper function to check for and perform decoding in base64
          */
-        vector<BYTE> decode(vector<BYTE>& buffer, size_t length);
+        vector<BYTE> decode(vector<BYTE>& buffer, size_t length) const;
 };
 
 #endif

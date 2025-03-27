@@ -19,9 +19,10 @@ int main(int argc, char* argv[]) {
 
     EntropyCalculator calc;
     cout << "starting test" << endl;
-    calc.calc_shannon_entropy("/home/vm/Desktop/vscode/609Capstone/encryption_zone/test6.zip.GNNCRY", 1);
-    calc.calc_shannon_entropy("/home/vm/Desktop/vscode/609Capstone/encryption_zone/decoded.txt", 1);
-
+    //calc.calc_shannon_entropy("/home/vm/Desktop/vscode/609Capstone/encryption_zone/decoded.txt", 5);
+    calc.calc_shannon_entropy("/home/vm/Desktop/vscode/609Capstone/encryption_zone/test6.zip.GNNCRY", 5);
+    //calc.calc_shannon_entropy("/home/vm/Desktop/vscode/609Capstone/app/ASL_Alphabet_Classifier-main.zip", 2);
+    cout << "Done tests" << endl;
     EventDetector detector;
     detector.add_watch(argv[1]);
 
