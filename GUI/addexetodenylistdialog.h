@@ -15,6 +15,9 @@ public:
     explicit addExeToDenylistDialog(QWidget *parent = nullptr);
     ~addExeToDenylistDialog();
 
+private slots:
+    void on_exeDenylistDialogButtons_accepted();
+
 private:
     Ui::addExeToDenylistDialog *ui;
 };

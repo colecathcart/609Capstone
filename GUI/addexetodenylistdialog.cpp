@@ -12,3 +12,9 @@ addExeToDenylistDialog::~addExeToDenylistDialog()
 {
     delete ui;
 }
+
+void addExeToDenylistDialog::on_exeDenylistDialogButtons_accepted()
+{
+    return;
+}
+

@@ -4,6 +4,7 @@
 #include "adddirectorytowhitelistdialog.h"
 #include "systemmonitor.h"
 #include <QTimer>
+#include <QFile>
 
 MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),

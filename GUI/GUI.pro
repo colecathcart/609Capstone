@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     adddirectorytowhitelistdialog.cpp \
     addexetodenylistdialog.cpp \
+    allowlistanddenylistmanager.cpp \
     detectormanager.cpp \
     logreader.cpp \
     main.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 HEADERS += \
     adddirectorytowhitelistdialog.h \
     addexetodenylistdialog.h \
+    allowlistanddenylistmanager.h \
     detectormanager.h \
     logreader.h \
     mainwindow.h \
