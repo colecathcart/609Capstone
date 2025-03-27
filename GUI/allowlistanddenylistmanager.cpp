@@ -6,8 +6,8 @@
 
 
 AllowListAndDenyListManager::AllowListAndDenyListManager() {
-    denyListExtensionsModel = new QStringListModel(this);
-    allowListDirectoriesModel = new QStringListModel(this);
+    denyListExtensionsModel = new QStringListModel();
+    allowListDirectoriesModel = new QStringListModel();
 
     loadDenyListExtensions();
     loadAllowListDirectories();

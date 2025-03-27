@@ -18,6 +18,9 @@ MainWindow::MainWindow(QWidget *parent):
 
     this->isOn = false;
 
+
+
+
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::fetchData);
     timer->start(500);
