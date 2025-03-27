@@ -29,6 +29,7 @@ private:
     size_t max_queue_size = 100; ///< Maximum number of stored events
     Analyzer analyzer; ///< For passing events to
     Logger* logger; ///< Reference to singleton logger
+    unordered_set<string> whitelist_dirs; ///< Set of whitelisted directories
 
 public:
     /**
@@ -62,7 +63,6 @@ public:
      * @brief Retrieves the fanotify file descriptor.
      * @return The fanotify file descriptor.
      */
-
     int get_fanotify_fd() const;
 
     /**
@@ -77,7 +77,7 @@ public:
      * @param path The path to check.
      * @return True if the path is not a concern, false otherwise.
      */
-    bool is_no_concern_path(const string &path);
+    bool is_whitelist_path(const string &path);
 };
 
 #endif // EVENT_DETECTOR_H

@@ -1,42 +1,44 @@
-all: ransomware_detector
+# Compiler and flags
+CXX = g++
+CXXFLAGS = -Wall -Iinclude
+LDFLAGS = -lssl -lcrypto -lmagic
+LDLIBS = -lgtest -pthread
 
-ransomware_detector: main.o entropy_calculator.o file_extension_checker.o event.o event_detector.o analyzer.o process_killer.o logger.o
-	g++ -Wall main.o entropy_calculator.o file_extension_checker.o event.o event_detector.o analyzer.o process_killer.o logger.o -lmagic -o ransomware_detector
+# Source files
+SRC = src/main.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp src/event.cpp src/event_detector.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp
 
-main.o: src/main.cpp 
-	g++ -Wall -Iinclude -c src/main.cpp
+# Object files (will be placed in the current directory)
+OBJ = $(SRC:src/%.cpp=%.o)
 
-entropy_calculator.o: src/entropy_calculator.cpp
-	g++ -Wall -Iinclude -c src/entropy_calculator.cpp
+# Target executables
+APP = ransomware_detector
+TEST_APP = test_app
 
-file_extension_checker.o: src/file_extension_checker.cpp
-	g++ -Wall -Iinclude -c src/file_extension_checker.cpp
+# Default target
+all: $(APP)
 
-event.o: src/event.cpp
-	g++ -Wall -Iinclude -c src/event.cpp
+# Build the main application
+$(APP): $(OBJ)
+	$(CXX) $(OBJ) $(LDFLAGS) -o $(APP)
 
-event_detector.o: src/event_detector.cpp
-	g++ -Wall -Iinclude -c src/event_detector.cpp
+# Build the test application
+test: $(SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp
+	$(CXX) $(SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp $(LDFLAGS) $(LDLIBS) -o $(TEST_APP)
+	sudo ./$(TEST_APP)
 
-analyzer.o: src/analyzer.cpp
-	g++ -Wall -Iinclude -c src/analyzer.cpp
+# General rule for compiling .cpp to .o (creates .o files in the current directory)
+%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-process_killer.o: src/process_killer.cpp
-	g++ -Wall -Iinclude -c src/process_killer.cpp
-
-logger.o: src/logger.cpp
-	g++ -Wall -Iinclude -c src/logger.cpp
-
-test: tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp src/event_detector.cpp src/event.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp
-	g++ -Wall -Iinclude tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp src/event_detector.cpp src/event.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp -lgtest -pthread -lmagic -o test_app
-	sudo ./test_app
-
+# Clean up the build
 remove:
-	rm -f *.o app test_app
+	rm -f $(OBJ) $(APP) $(TEST_APP)
 
-without_objects:
-	rm -f *.o
+# Clean up everything including .o files
+remove_objects:
+	rm -f $(OBJ)
 
-no_obj: all without_objects
+no_obj: all remove_objects
 
+# Clean target
 clean: remove

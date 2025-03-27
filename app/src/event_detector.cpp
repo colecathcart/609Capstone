@@ -10,12 +10,29 @@
 #include <errno.h>
 #include <sstream>
 
+#define WHITELIST_DIRS_PATH "data/whitelist_dirs.txt"
+
 using namespace std;
 
 // Constructor for EventDetector
 EventDetector::EventDetector(): analyzer(Analyzer()) {
     logger = Logger::getInstance();
     logger->log( "Initializing EventDetector...");
+
+    ifstream file(WHITELIST_DIRS_PATH);
+    string extension;
+
+    if (file.is_open()) {
+        while (getline(file, extension)) {
+            if (!extension.empty()) {
+                whitelist_dirs.insert(extension);
+            }
+        }
+        file.close();
+    } else {
+        logger->log("Error opening whitelist dirs file");
+    }   
+
     // Initialize fanotify file descriptor
     fanotify_fd = fanotify_init(FAN_CLASS_CONTENT, O_RDONLY);
     if (fanotify_fd == -1) {
@@ -58,10 +75,18 @@ bool EventDetector::is_hidden_path(const string& path) {
     return false;
 }
 
-bool EventDetector::is_no_concern_path(const std::string &path) {
-    // Check if the path contains /tmp/ or /var/spool/
-    if (path.find("/tmp/") != string::npos || path.find("/var/spool/") != string::npos) {
-        return true;
+bool EventDetector::is_whitelist_path(const std::string &path) {
+    
+    size_t pos = path.rfind('/');
+    string path_without_file = path;
+    if (pos != std::string::npos) {
+        path_without_file = path_without_file.substr(0, pos + 1);
+    }
+    
+    for(const auto& prefix : whitelist_dirs) {
+        if(path.find(prefix) == 0) {
+            return true;
+        }
     }
     return false;
 }
@@ -118,7 +143,7 @@ void EventDetector::process_events() {
                 }
 
                 // **Skip hidden files and directories BEFORE checking event type**
-                if (is_hidden_path(full_path) || is_no_concern_path(full_path)) {
+                if (is_hidden_path(full_path) || is_whitelist_path(full_path)) {
                     close(metadata->fd);
                     metadata = FAN_EVENT_NEXT(metadata, len);
                     continue;
@@ -175,14 +200,12 @@ void EventDetector::process_events() {
                 // Extract filename and extension from the full path
                 size_t last_slash = full_path.find_last_of("/");
                 string filename = (last_slash != string::npos) ? full_path.substr(last_slash + 1) : full_path;
-                size_t dot_pos = filename.find_last_of(".");
-                string extension = (dot_pos != string::npos) ? filename.substr(dot_pos + 1) : "";
 
                 // Get the current timestamp
                 time_t timestamp = time(nullptr);
 
                 // Create an Event object
-                Event event(str, full_path, filename, extension, timestamp, metadata->pid);
+                Event event(str, full_path, filename, timestamp, metadata->pid);
 
                 // Log the event
                 logger->log(event.print());
@@ -191,7 +214,6 @@ void EventDetector::process_events() {
                 strcpy(last_path, full_path.c_str());
 
                 // Call analyzer
-
                 analyzer.analyze(event);
 
                 // Close the file descriptor associated with the event

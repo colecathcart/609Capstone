@@ -17,6 +17,7 @@ int main(int argc, char* argv[]) {
     Logger* logger = Logger::getInstance();
     logger->log("Starting detector...");
 
+    EntropyCalculator calc;
     EventDetector detector;
     detector.add_watch(argv[1]);
 

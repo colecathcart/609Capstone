@@ -3,6 +3,10 @@
 
 #include <string>
 #include "logger.h"
+#include <unordered_map>
+#include <vector>
+
+typedef unsigned char BYTE;
 
 using namespace std;
 
@@ -27,18 +31,28 @@ class EntropyCalculator
         EntropyCalculator(int buff_size_kb);
 
         /**
-         * @brief Function to calculate the shannon entropy of a given file.
+         * @brief Function to calculate if a given file has high entropy blocks
          * @param filepath The path to the file to be tested.
+         * @param hits The number of times the process has been seen, used to increase the amount of the file
+         * for which entropy is calculated.
          */
-        double get_shannon_entropy(const string& filepath) const;
+        bool calc_shannon_entropy(const string& filepath, int hits) const;
 
         /**
          * @brief Function to perform the NIST monobit test on a given file.
          * A true result denotes that 90% or more of the blocks in the file
          * (determined by the buffer_size) passed the test.
-         * @param filepath The path to the files to be tested.
+         * @param filepath The path to the file to be tested.
+         * @param hits The number of times the process has been seen, used to increase the amount of the file
+         * for which the test is calculated.
          */
-        bool monobit_test(const string& filepath) const;
+        bool monobit_test(const string& filepath, int hits) const;
+
+        /**
+         * @brief Function to get the SHA256 hash of the file, for the purpose of comparison.
+         * @param filepath The path to the file to be tested.
+         */
+        string get_file_hash(const string& filepath) const;
     
     private:
 
@@ -46,16 +60,22 @@ class EntropyCalculator
          * @brief The size of buffer (in Bytes) to be read from a file at a time
          */
         const size_t buffer_size;
-
         /**
-         * @brief Helper function to ignore small files (< 1 KB)
+         * @brief All valid base64 characters for checking encoding
          */
-        bool is_small_file(const string& filepath) const;
-
+        static const unordered_map<BYTE, int> base64_set;
         /**
          * @brief Reference to singleton logger
          */
         Logger* logger;
+        /**
+         * @brief Helper function to ignore small files (< 1 KB)
+         */
+        bool is_small_file(const string& filepath) const;
+        /**
+         * @brief Helper function to check for and perform decoding in base64
+         */
+        vector<BYTE> decode(vector<BYTE>& buffer, size_t length) const;
 };
 
 #endif

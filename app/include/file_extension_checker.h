@@ -30,20 +30,38 @@ class FileExtensionChecker
          * @brief Checks if a file extension is suspicious.
          * @param filepath The path to the file to be tested.
          */
-        bool is_suspicious(const string& filepath) const;
+        bool is_blacklist_extension(const string& filepath) const;
     
+        /**
+         * @brief Checks if a directory path is whitelisted.
+         * @param filepath The path to the directory to be tested.
+         */
+        bool is_whitelist_dir(const string& dirpath) const;
+
+        /**
+         * @brief Checks if a package is whitelisted.
+         * @param filepath The path to the file to be tested.
+         */
+        bool is_whitelist_package(const string& filepath) const;
+
     private:
 
         /**
          * @brief A set of known high-entropy file types.
          */
-        static const unordered_set<string> known_high_ent;
-
+        static const unordered_set<string> good_high_ent;
         /**
          * @brief A set of known suspicious file extensions.
          */
-        static const unordered_set<string> known_suspicious;
-
+        static const unordered_set<string> bad_extensions;
+        /**
+         * @brief A set of whitelisted directories.
+         */
+        static const unordered_set<string> good_dirs;
+        /**
+         * @brief A set of whitelisted packages.
+         */
+        static const unordered_set<string> good_packages;
         /**
          * @brief Pointer to a cookie in the magic database
          */

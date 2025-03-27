@@ -17,7 +17,7 @@ string ProcessKiller::getExecutablePath(pid_t pid) const {
     ssize_t len = readlink(exe_path.c_str(), resolved_path, sizeof(resolved_path) - 1);
 
     if (len != -1) {
-        resolved_path[len] = '\0'; // Null-terminate the string
+        resolved_path[len] = '\0';
         return string(resolved_path);
     } else {
         logger->log("Failed to resolve ransomware executable path for PID: " + to_string(pid));

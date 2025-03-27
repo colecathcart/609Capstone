@@ -7,6 +7,8 @@
 #include "entropy_calculator.h"
 #include "file_extension_checker.h"
 #include "process_killer.h"
+#include <cstdint>
+#include <tuple>
 
 using namespace std;
 
@@ -25,8 +27,8 @@ class Analyzer
         Analyzer();
 
         /**
-         * @brief Analyzes the given event, storing the process id and timestamp
-         * internally if deemed suspicious.
+         * @brief Analyzes the given event, storing the process id, creation time and
+         * number of times that process has been seen.
          * @param event The event to be analyzed
          */
         void analyze(Event& event);
@@ -34,9 +36,22 @@ class Analyzer
     private:
 
         /**
-         * @brief A map holding identified suspicious processes
+         * @brief Struct for holding process info for process tracking
+         * @param time The start time of the process
+         * @param hits The number of times this process has been seen
          */
-        unordered_map<pid_t, time_t> suspicious_procs;
+        struct Process {
+            uint64_t time;
+            int hits;
+        
+            Process(uint64_t start_time, int num_hits) : time(start_time), hits(num_hits) {}
+            Process() : time(0), hits(0) {}
+        };
+
+        /**
+         * @brief A map holding trusted procs with their creation time and number of hits
+         */
+        unordered_map<pid_t, Process> watched_procs;
 
         /**
          * @brief An instance of EntropyCalculator for determining encryption
@@ -54,14 +69,26 @@ class Analyzer
         ProcessKiller process_killer;
 
         /**
-         * @brief Helper function to update suspicious_procs and take action if required
-         */
-        void update_watch(pid_t pid, time_t timestamp);
-
-        /**
          * @brief reference to singleton logger
          */
         Logger* logger;
+
+        /**
+         * @brief Function to update the process watchlist for the given pid
+         * @return The number of times this process has been seen.
+         */
+        int update_watch(pid_t pid);
+
+        /**
+         * @brief Helper function to save hash to a file
+         */
+        void save_hash(const string& hash) const;
+
+        /**
+         * @brief Helper function to get process start time
+         */
+        uint64_t get_start_time(pid_t pid);
+
 };
 
 #endif
