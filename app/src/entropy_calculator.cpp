@@ -7,6 +7,7 @@
 #include <openssl/evp.h>
 #include <sstream>
 #include <iomanip>
+#include <string.h>
 
 #define MEGABYTE 1024 * 1024
 #define KILOBYTE 1024
@@ -51,33 +52,27 @@ bool EntropyCalculator::is_small_file(const string& filepath) const {
     return false;
 }
 
+// Code adapted from https://github.com/ReneNyffenegger/cpp-base64 (open license)
 vector<BYTE> EntropyCalculator::decode(vector<BYTE>& buffer, size_t length) const{
     int to_count = min(100, (int)length);
     for(int i = 0; i < to_count; i++) {
         if(base64_set.find(buffer[i]) == base64_set.end()) {
-            cout << "not encoded" << endl;
             return buffer;
         }
     }
 
-    string encoded_string(buffer.begin(), buffer.begin() + 1024);
-
-    string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "abcdefghijklmnopqrstuvwxyz"
-    "0123456789+/";
-
-    int in_len = encoded_string.size();
+    int in_len = (int)length;
     int i = 0;
     int j = 0;
     int in_ = 0;
     BYTE char_array_4[4], char_array_3[3];
     std::vector<BYTE> ret;
 
-    while (in_len-- && ( encoded_string[in_] != '=')) {
-        char_array_4[i++] = encoded_string[in_]; in_++;
+    while (in_len-- && (buffer[in_] != '=')) {
+        char_array_4[i++] = buffer[in_]; in_++;
         if (i ==4) {
         for (i = 0; i <4; i++)
-            char_array_4[i] = base64_chars.find(char_array_4[i]);
+            char_array_4[i] = base64_set.find(char_array_4[i])->second;
 
         char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
         char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
@@ -94,7 +89,7 @@ vector<BYTE> EntropyCalculator::decode(vector<BYTE>& buffer, size_t length) cons
         char_array_4[j] = 0;
 
         for (j = 0; j <4; j++)
-        char_array_4[j] = base64_chars.find(char_array_4[j]);
+        char_array_4[j] = base64_set.find(char_array_4[j])->second;
 
         char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
         char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
@@ -102,9 +97,7 @@ vector<BYTE> EntropyCalculator::decode(vector<BYTE>& buffer, size_t length) cons
 
         for (j = 0; (j < i - 1); j++) ret.push_back(char_array_3[j]);
     }
-
     return ret;
-
 }
 
 bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) const {
@@ -121,6 +114,8 @@ bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) c
     }
 
     int mbs_to_read = 0;
+
+    // Don't hate on the switch case!
     switch (hits)
     {
     case 1:
@@ -154,11 +149,11 @@ bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) c
             continue;
         }
 
-        vector<BYTE> test = decode(buffer, bytes_read);
-        cout << test.data() << endl;
+        vector<BYTE> decoded_buffer = decode(buffer, bytes_read);
+        bytes_read = decoded_buffer.size();
 
         for (size_t i = 0; i < bytes_read; i++) {
-            frequencies[buffer[i]]++;
+            frequencies[decoded_buffer[i]]++;
         }
 
         double entropy = 0.0;
@@ -167,7 +162,6 @@ bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) c
             entropy -= probability * log2(probability);
         }
 
-        cout << "Entropy:" << entropy << endl;
         if (entropy > 7.5) {
             file.close();
             return true;
@@ -192,46 +186,92 @@ bool EntropyCalculator::monobit_test(const string& filepath, int hits) const {
         return 1;
     }
 
-    vector<BYTE> buffer(buffer_size);
-    double num_blocks = 0.0;
-    double num_passed_blocks = 0.0;
+    int mbs_to_read = 0;
 
-    while (file.read(reinterpret_cast<char*>(buffer.data()), buffer_size) || file.gcount() > 0) {
-        
-        streamsize bytes_read = file.gcount();
-        num_blocks++;
+    // Don't hate on the switch case!
+    switch (hits)
+    {
+    case 1:
+        mbs_to_read = 1;
+        break;
+    case 2:
+        mbs_to_read = 10;
+        break;
+    case 3:
+        mbs_to_read = 20;
+        break;
+    case 4:
+        mbs_to_read = 50;
+        break;
+    default:
+        mbs_to_read = 100;
+        break;
+    }
 
-        // not worth running monobit test on < 100 bits
-        if (bytes_read < 13) {
-            break;
+    vector<BYTE> outer_buffer(MEGABYTE);
+    size_t total_bytes_read = 0;
+    size_t bytes_to_read = mbs_to_read * MEGABYTE;
+
+    while (total_bytes_read < bytes_to_read && file.read(reinterpret_cast<char*>(outer_buffer.data()), outer_buffer.size())) {
+        size_t bytes_read = file.gcount();
+        total_bytes_read += bytes_read;
+
+        vector<BYTE> decoded_buffer = decode(outer_buffer, bytes_read);
+        bytes_read = decoded_buffer.size();
+
+        if (bytes_read < KILOBYTE * 10) {
+            continue;
         }
-        long count_1s = 0;
 
-        for (int i = 0; i < bytes_read; i++) {
-            for (int j = 7; j >= 0; j--) {
-                if(buffer[i] & (1 << j)) {
-                    count_1s++;
+        vector<BYTE> inner_buffer(KILOBYTE);
+        double num_blocks = 0.0;
+        double num_passed_blocks = 0.0;
+
+        auto iterator = outer_buffer.begin();
+        size_t inner_bytes_read = 0;
+        while(inner_bytes_read < bytes_read) {
+            size_t increment = KILOBYTE;
+            num_blocks++;
+
+            if (inner_bytes_read + increment > bytes_read) {
+                increment = bytes_read - inner_bytes_read;
+            }
+            copy(iterator, iterator + increment, inner_buffer.begin());
+            iterator += increment;
+            inner_bytes_read += increment;
+
+            if (increment < 13) {
+                break;
+            }
+            long count_1s = 0;
+    
+            for (int i = 0; i < (int)increment; i++) {
+                for (int j = 7; j >= 0; j--) {
+                    if(inner_buffer[i] & (1 << j)) {
+                        count_1s++;
+                    }
                 }
             }
+    
+            long num_bits = increment * 8;
+            long sn = abs(count_1s - (num_bits - count_1s));
+            double s_obs = sn / sqrt(num_bits);
+            double p_value = erfc(s_obs / sqrt(2));
+    
+            if(p_value >= 0.01) {
+                num_passed_blocks++;
+            } 
+        }
+        
+        //cout << num_passed_blocks << " / " << num_blocks << " blocks passed" << endl;
+    
+        if (num_passed_blocks / num_blocks >= 0.9) {
+            file.close();
+            return true;
         }
 
-        long num_bits = bytes_read * 8;
-        long sn = abs(count_1s - (num_bits - count_1s));
-        double s_obs = sn / sqrt(num_bits);
-        double p_value = erfc(s_obs / sqrt(2));
-
-        if(p_value >= 0.01) {
-            num_passed_blocks++;
-        } 
     }
-
     file.close();
-
-    cout << num_passed_blocks << " / " << num_blocks << " blocks passed" << endl;
-
-    if (num_passed_blocks / num_blocks >= 0.9) {
-        return true;
-    }
     return false;
 }
 
