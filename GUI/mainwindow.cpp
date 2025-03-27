@@ -57,6 +57,9 @@ void MainWindow::update(const bool isOn, const double cpu, const double mem, con
         ui->statusText->setMarkdown("Ransomware detector is not running.");
     }
 
+    ui->denylistExeList->setModel(listManager->getDenyListExtensionModel());
+    ui->whitelistDirectoryList->setModel(listManager->getAllowListDirectoryModel());
+
 }
 
 void MainWindow::on_startButton_released()
@@ -82,7 +85,7 @@ void MainWindow::on_stopButton_released()
 
 void MainWindow::on_newDirectoryButton_clicked()
 {
-    AddDirectoryToWhitelistDialog whitelistDialog;
+    AddDirectoryToWhitelistDialog whitelistDialog(this, listManager);
     whitelistDialog.setModal(true);
     whitelistDialog.exec();
 }
@@ -90,7 +93,7 @@ void MainWindow::on_newDirectoryButton_clicked()
 
 void MainWindow::on_newExeButton_released()
 {
-    addExeToDenylistDialog denylistDialog;
+    addExeToDenylistDialog denylistDialog(this, listManager);
     denylistDialog.setModal(true);
     denylistDialog.exec();
 }
