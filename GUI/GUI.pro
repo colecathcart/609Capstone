@@ -10,7 +10,8 @@ CONFIG += c++17
 
 SOURCES += \
     adddirectorytowhitelistdialog.cpp \
-    addexetowhitelistdialog.cpp \
+    addexetodenylistdialog.cpp \
+    allowlistanddenylistmanager.cpp \
     detectormanager.cpp \
     logreader.cpp \
     main.cpp \
@@ -19,7 +20,8 @@ SOURCES += \
 
 HEADERS += \
     adddirectorytowhitelistdialog.h \
-    addexetowhitelistdialog.h \
+    addexetodenylistdialog.h \
+    allowlistanddenylistmanager.h \
     detectormanager.h \
     logreader.h \
     mainwindow.h \
@@ -28,7 +30,7 @@ HEADERS += \
 
 FORMS += \
     adddirectorytowhitelistdialog.ui \
-    addexetowhitelistdialog.ui \
+    addexetodenylistdialog.ui \
     mainwindow.ui
 
 # Default rules for deployment.

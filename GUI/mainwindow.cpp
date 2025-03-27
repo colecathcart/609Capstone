@@ -1,20 +1,25 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "addexetowhitelistdialog.h"
+#include "addexetodenylistdialog.h"
 #include "adddirectorytowhitelistdialog.h"
 #include "systemmonitor.h"
 #include <QTimer>
+#include <QFile>
 
 MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     monitor(new SystemMonitor),
-    detector(new DetectorManager)
+    detector(new DetectorManager),
+    listManager(new AllowListAndDenyListManager)
 {
     ui->setupUi(this);
     monitor->addObserver(this);
 
     this->isOn = false;
+
+    ui->denylistExeList->setModel(listManager->getDenyListExtensionModel());
+    ui->whitelistDirectoryList->setModel(listManager->getAllowListDirectoryModel());
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::fetchData);
@@ -52,26 +57,10 @@ void MainWindow::update(const bool isOn, const double cpu, const double mem, con
         ui->statusText->setMarkdown("Ransomware detector is not running.");
     }
 
-}
-
-
-void MainWindow::on_newExeButton_clicked()
-{
-    addExeToWhitelistDialog whitelistDialog;
-    whitelistDialog.setModal(true);
-    whitelistDialog.exec();
-
+    ui->denylistExeList->setModel(listManager->getDenyListExtensionModel());
+    ui->whitelistDirectoryList->setModel(listManager->getAllowListDirectoryModel());
 
 }
-
-
-void MainWindow::on_newDirectoryButton_clicked()
-{
-    AddDirectoryToWhitelistDialog whitelistDialog;
-    whitelistDialog.setModal(true);
-    whitelistDialog.exec();
-}
-
 
 void MainWindow::on_startButton_released()
 {
@@ -91,5 +80,52 @@ void MainWindow::on_stopButton_released()
     } else {
         return;
     }
+}
+
+
+void MainWindow::on_newDirectoryButton_clicked()
+{
+    AddDirectoryToWhitelistDialog whitelistDialog(this, listManager);
+    whitelistDialog.setModal(true);
+    whitelistDialog.exec();
+}
+
+
+void MainWindow::on_newExeButton_released()
+{
+    addExeToDenylistDialog denylistDialog(this, listManager);
+    denylistDialog.setModal(true);
+    denylistDialog.exec();
+}
+
+
+void MainWindow::on_removeDirectoryButton_released()
+{
+    // Get the selected index from the QListView
+    QModelIndex selectedIndex = ui->whitelistDirectoryList->selectionModel()->currentIndex();
+
+    if (selectedIndex.isValid()) {
+        // Get the selected directory from the model
+        QString selectedDirectory = selectedIndex.data().toString();
+
+        // Remove the selected directory using the manager
+        listManager->removeAllowListDirectory(selectedDirectory);
+    }
+}
+
+
+void MainWindow::on_removeExeButton_released()
+{
+    // Get the selected index from the QListView
+    QModelIndex selectedIndex = ui->denylistExeList->selectionModel()->currentIndex();
+
+    if (selectedIndex.isValid()) {
+        // Get the selected directory from the model
+        QString selectedExtension = selectedIndex.data().toString();
+
+        // Remove the selected directory using the manager
+        listManager->removeDenyListExtension(selectedExtension);
+    }
+
 }
 

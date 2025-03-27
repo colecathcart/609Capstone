@@ -44,7 +44,7 @@ public:
      * @param message The message to log
      * @param whereto Where to log the message: 0 = stdout, 1 = logfile, 2 = fifo pipe, 3 = all
      */
-    void log(const string& message, int whereto = 0);
+    void log(const string& message, int whereto = 3);
 };
 
 #endif
