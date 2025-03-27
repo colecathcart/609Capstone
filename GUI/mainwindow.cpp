@@ -5,6 +5,7 @@
 #include "systemmonitor.h"
 #include <QTimer>
 #include <QFile>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),
@@ -85,9 +86,17 @@ void MainWindow::on_stopButton_released()
 
 void MainWindow::on_newDirectoryButton_clicked()
 {
-    AddDirectoryToWhitelistDialog whitelistDialog(this, listManager);
-    whitelistDialog.setModal(true);
-    whitelistDialog.exec();
+
+    QString directory = QFileDialog::getExistingDirectory(this, tr("Select Directory"), "/",QFileDialog::ShowDirsOnly);
+
+    if (!directory.isEmpty()) {
+        listManager->addAllowListDirectory(directory.append('/'));
+    } else {
+        qWarning() << "No directory selected.";
+    }
+    //AddDirectoryToWhitelistDialog whitelistDialog(this, listManager);
+    //whitelistDialog.setModal(true);
+    //whitelistDialog.exec();
 }
 
 
