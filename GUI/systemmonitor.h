@@ -6,6 +6,7 @@
 #include <QProcess>
 #include <QRegularExpression>
 #include "systemobserver.h"
+#include "logreader.h"
 
 class SystemMonitor {
 public:
@@ -17,9 +18,9 @@ public:
         observers.removeAll(observer);
     }
 
-    void notifyObservers(const bool isOn, const double cpu, const double mem) {
+    void notifyObservers(const bool isOn, const double cpu, const double mem, const QString &log) {
         for (auto observer : observers) {
-            observer->update(isOn, cpu, mem);
+            observer->update(isOn, cpu, mem, log);
         }
     }
 
@@ -32,7 +33,7 @@ public:
 
 
         if (pidOutput.isEmpty()) {
-            notifyObservers(false, 0,0);
+            notifyObservers(false, 0,0, nullptr);
             return;
         }
 
@@ -57,13 +58,18 @@ public:
             }
         }
 
-        notifyObservers(true, totalCpu, totalMem);
+        QString msg = reader.receive_message();
+
+        notifyObservers(true, totalCpu, totalMem, msg);
 
     }
 
 private:
     QList<SystemObserver*> observers;
     static QRegularExpression whitespaceSplitter;
+    LogReader reader;
+
+
 };
 
 #endif // SYSTEMMONITOR_H

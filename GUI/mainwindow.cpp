@@ -31,7 +31,7 @@ void MainWindow::fetchData() {
     monitor->fetchAndNotify("ransomware_detector");
 }
 
-void MainWindow::update(const bool isOn, const double cpu, const double mem) {
+void MainWindow::update(const bool isOn, const double cpu, const double mem, const QString &log) {
     // Update the CPU progress bar with 2 decimal places
     ui->cpuProgressBar->setValue(static_cast<int>(cpu));  // Update the actual progress value
     ui->cpuProgressBar->setFormat(QString::number(cpu, 'f', 2) + "%");
@@ -39,6 +39,10 @@ void MainWindow::update(const bool isOn, const double cpu, const double mem) {
     // Update the memory progress bar with 2 decimal places
     ui->memProgressBar->setValue(static_cast<int>(mem));  // Update the actual progress value
     ui->memProgressBar->setFormat(QString::number(mem, 'f', 2) + "%");
+
+    if (log != "") {
+        ui->loggingText->append(log);
+    }
 
     if (isOn) {
         this->isOn = true;

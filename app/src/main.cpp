@@ -17,14 +17,12 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    // Give system/network a moment to stabilize
-    this_thread::sleep_for(std::chrono::milliseconds(1000));
-
     thread ws_client_thread(connect_to_websocket_host, WEBSOCKET_URI);
 
     Logger* logger = Logger::getInstance();
     logger->log("Starting detector...");
 
+    EntropyCalculator calc;
     EventDetector detector;
     detector.add_watch(argv[1]);
 

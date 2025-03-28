@@ -11,15 +11,21 @@ void start_websocket_server();
 void connect_to_websocket_host(const string& uri);
 
 // Called by Analyzer to send stat updates ("SUSPICIOUS" or "KILLED")
-void send_stat_update(const string& type);
+void send_stat_update(const std::string& type);
 
-// Updates or inserts a device's status (Online, Offline, Threat Detected, etc.)
-void set_device_status(const string& name, const string& status);
+// Insert or update a device's status (e.g., "Online", "Offline", "Threat Detected")
+void set_device_status(const std::string& name, const std::string& status);
 
-// Returns the combined JSON payload of system stats + device statuses
+// Returns a combined JSON payload (stats, device statuses, blacklisted hashes)
 string get_combined_payload();
 
-// Returns the current device hostname
+// Get the local device hostname
 string get_device_name();
+
+// Increment a numeric field in system_stats (e.g., "suspicious_detected")
+void increment_stat(const std::string& field);
+
+// Add a hash to the blacklist_hashes table and broadcast
+void add_blacklisted_hash(const std::string& hash);
 
 #endif // WEBSOCKET_SERVER_H

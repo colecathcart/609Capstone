@@ -12,6 +12,7 @@ SOURCES += \
     adddirectorytowhitelistdialog.cpp \
     addexetowhitelistdialog.cpp \
     detectormanager.cpp \
+    logreader.cpp \
     main.cpp \
     mainwindow.cpp \
     systemmonitor.cpp
@@ -20,6 +21,7 @@ HEADERS += \
     adddirectorytowhitelistdialog.h \
     addexetowhitelistdialog.h \
     detectormanager.h \
+    logreader.h \
     mainwindow.h \
     systemmonitor.h \
     systemobserver.h
