@@ -5,6 +5,7 @@
 #include <systemmonitor.h>
 #include <systemobserver.h>
 #include <detectormanager.h>
+#include <allowlistanddenylistmanager.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,8 +24,6 @@ public:
 
 
 private slots:
-    void on_newExeButton_clicked();
-
     void on_newDirectoryButton_clicked();
 
     void fetchData();
@@ -33,10 +32,17 @@ private slots:
 
     void on_stopButton_released();
 
+    void on_newExeButton_released();
+
+    void on_removeDirectoryButton_released();
+
+    void on_removeExeButton_released();
+
 private:
     Ui::MainWindow *ui;
     SystemMonitor *monitor;
     DetectorManager *detector;
+    AllowListAndDenyListManager *listManager;
     bool isOn;
 };
 #endif // MAINWINDOW_H

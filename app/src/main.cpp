@@ -20,9 +20,11 @@ int main(int argc, char* argv[]) {
     thread ws_client_thread(connect_to_websocket_host, WEBSOCKET_URI);
 
     Logger* logger = Logger::getInstance();
+    if (argc == 3) {
+        logger->set_destination(stoi(argv[2]));
+    }
     logger->log("Starting detector...");
 
-    EntropyCalculator calc;
     EventDetector detector;
     detector.add_watch(argv[1]);
 

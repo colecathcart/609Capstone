@@ -24,7 +24,6 @@ const unordered_map<BYTE, int> EntropyCalculator::base64_set = {
     {'l', 37}, {'m', 38}, {'n', 39}, {'o', 40}, {'p', 41}, {'q', 42}, {'r', 43}, {'s', 44}, {'t', 45}, 
     {'u', 46}, {'v', 47}, {'w', 48}, {'x', 49}, {'y', 50}, {'z', 51}, {'0', 52}, {'1', 53}, {'2', 54}, 
     {'3', 55}, {'4', 56}, {'5', 57}, {'6', 58}, {'7', 59}, {'8', 60}, {'9', 61}, {'+', 62}, {'/', 63}, 
-    {'=', 64}
 };
 
 EntropyCalculator::EntropyCalculator(): buffer_size(1024) {
@@ -60,6 +59,9 @@ vector<BYTE> EntropyCalculator::decode(vector<BYTE>& buffer, size_t length) cons
             return buffer;
         }
     }
+    while( length % 4 != 0) {
+        length--;
+    }
 
     int in_len = (int)length;
     int i = 0;
@@ -71,26 +73,37 @@ vector<BYTE> EntropyCalculator::decode(vector<BYTE>& buffer, size_t length) cons
     while (in_len-- && (buffer[in_] != '=')) {
         char_array_4[i++] = buffer[in_]; in_++;
         if (i ==4) {
-        for (i = 0; i <4; i++)
-            char_array_4[i] = base64_set.find(char_array_4[i])->second;
+            for (i = 0; i <4; i++) {
+                auto found = base64_set.find(char_array_4[i]);
+                if(found == base64_set.end()) {
+                    char_array_4[i] = -1;
+                } else {
+                    char_array_4[i] = found->second;
+                }
+            }
 
-        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-        for (i = 0; (i < 3); i++)
-            ret.push_back(char_array_3[i]);
-        i = 0;
+            for (i = 0; (i < 3); i++)
+                ret.push_back(char_array_3[i]);
+            i = 0;
         }
     }
 
     if (i) {
         for (j = i; j <4; j++)
-        char_array_4[j] = 0;
+            char_array_4[j] = 0;
 
-        for (j = 0; j <4; j++)
-        char_array_4[j] = base64_set.find(char_array_4[j])->second;
-
+        for (j = 0; j <4; j++) {
+            auto found = base64_set.find(char_array_4[j]);
+            if(found == base64_set.end()) {
+                char_array_4[j] = -1;
+            } else {
+                char_array_4[j] = found->second;
+            }
+        }
         char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
         char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
         char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
@@ -101,8 +114,8 @@ vector<BYTE> EntropyCalculator::decode(vector<BYTE>& buffer, size_t length) cons
 }
 
 bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) const {
-    
     if(is_small_file(filepath)) {
+        logger->log("ignoring small file");
         return false;
     }
 
@@ -140,8 +153,7 @@ bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) c
     size_t total_bytes_read = 0;
     size_t bytes_to_read = mbs_to_read * MEGABYTE;
 
-
-    while (total_bytes_read < bytes_to_read && file.read(reinterpret_cast<char*>(buffer.data()), buffer.size())) {
+    while (total_bytes_read < bytes_to_read && (file.read(reinterpret_cast<char*>(buffer.data()), buffer.size()) || file.gcount() > 0)) {
         size_t bytes_read = file.gcount();
         total_bytes_read += bytes_read;
         
@@ -161,6 +173,8 @@ bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) c
             double probability = static_cast<double>(pair.second) / bytes_read;
             entropy -= probability * log2(probability);
         }
+
+        // cout << "Entropy: " << entropy << endl;
 
         if (entropy > 7.5) {
             file.close();
@@ -212,7 +226,7 @@ bool EntropyCalculator::monobit_test(const string& filepath, int hits) const {
     size_t total_bytes_read = 0;
     size_t bytes_to_read = mbs_to_read * MEGABYTE;
 
-    while (total_bytes_read < bytes_to_read && file.read(reinterpret_cast<char*>(outer_buffer.data()), outer_buffer.size())) {
+    while (total_bytes_read < bytes_to_read && (file.read(reinterpret_cast<char*>(outer_buffer.data()), outer_buffer.size()) || file.gcount() > 0)) {
         size_t bytes_read = file.gcount();
         total_bytes_read += bytes_read;
 
@@ -263,7 +277,7 @@ bool EntropyCalculator::monobit_test(const string& filepath, int hits) const {
             } 
         }
         
-        //cout << num_passed_blocks << " / " << num_blocks << " blocks passed" << endl;
+        // cout << num_passed_blocks << " / " << num_blocks << " blocks passed" << endl;
     
         if (num_passed_blocks / num_blocks >= 0.9) {
             file.close();
