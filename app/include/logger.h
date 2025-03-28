@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <mqueue.h>
+#include <mutex>
 
 using namespace std;
 
@@ -13,10 +14,6 @@ using namespace std;
  */
 class Logger {
 private:
-    /**
-     * @brief Singleton logger instance
-     */
-    static Logger* logger;
     /**
      * @brief The file to log to
      */
@@ -29,6 +26,10 @@ private:
      * @brief Where to send the logs to: 0 = stdout, 1 = logfile, 2 = fifo pipe, 3 = all
      */
     int whereto;
+    /**
+     * @brief Logger mutex for thread safety
+     */
+    mutex logger_mutex;
     
     Logger(); // Private constructor
     
@@ -39,9 +40,9 @@ public:
     Logger& operator=(const Logger&) = delete; //Remove assignment operator
 
     /**
-     * @brief Instantiate a pointer to the singleton instance
+     * @brief Thread-safe "Meyers' Singleton" getter function
      */
-    static Logger* getInstance();
+    static Logger& getInstance();
 
     /**
      * @brief Set the location of all future logs

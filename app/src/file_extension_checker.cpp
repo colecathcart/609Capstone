@@ -41,6 +41,8 @@ FileExtensionChecker::FileExtensionChecker() {
 }
 
 string FileExtensionChecker::get_type(const string& filepath) const {
+    lock_guard<mutex> lock(magic_mutex);
+
     const char* mime_type = magic_file(magic, filepath.c_str());
     // cout << mime_type << endl;
     if(!mime_type) {

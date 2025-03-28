@@ -9,6 +9,8 @@ Event::Event(const string& type,
             pid_t pid)
     : event_type(type), filepath(path), filename(name), time(timestamp), pid(pid) {}
 
+Event::Event(){};
+
 string Event::get_event_type() const { return event_type; }
 string Event::get_filepath() const { return filepath; }
 string Event::get_filename() const { return filename; }
