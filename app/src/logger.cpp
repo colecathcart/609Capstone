@@ -10,7 +10,7 @@ using namespace std;
 
 Logger* Logger::logger = nullptr;
 
-Logger::Logger() {
+Logger::Logger(): whereto(0) {
     const char* mqPath = "/guiMQ";
     struct mq_attr attr;
     attr.mq_flags = 0;
@@ -43,7 +43,11 @@ Logger* Logger::getInstance() {
     return logger;
 }
 
-void Logger::log(const string& message, int whereto) {
+void Logger::set_destination(int where) {
+    whereto = where;
+}
+
+void Logger::log(const string& message) {
     if(whereto == 0) {
         cout << message << endl;
     }else if(whereto == 1) {
