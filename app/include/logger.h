@@ -22,9 +22,13 @@ private:
      */
     ofstream logFile;
     /**
-     * @brief the message queue to log to (for communicating logs to the GUI)
+     * @brief The message queue to log to (for communicating logs to the GUI)
      */
     mqd_t mq;
+    /**
+     * @brief Where to send the logs to: 0 = stdout, 1 = logfile, 2 = fifo pipe, 3 = all
+     */
+    int whereto;
     
     Logger(); // Private constructor
     
@@ -40,11 +44,16 @@ public:
     static Logger* getInstance();
 
     /**
+     * @brief Set the location of all future logs
+     */
+    void set_destination(int destination);
+
+    /**
      * @brief Log a message to a variety of outputs (stdout by default)
      * @param message The message to log
      * @param whereto Where to log the message: 0 = stdout, 1 = logfile, 2 = fifo pipe, 3 = all
      */
-    void log(const string& message, int whereto = 0);
+    void log(const string& message);
 };
 
 #endif
