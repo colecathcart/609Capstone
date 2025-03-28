@@ -174,7 +174,7 @@ bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) c
             entropy -= probability * log2(probability);
         }
 
-        cout << "Entropy: " << entropy << endl;
+        // cout << "Entropy: " << entropy << endl;
 
         if (entropy > 7.5) {
             file.close();
@@ -277,7 +277,7 @@ bool EntropyCalculator::monobit_test(const string& filepath, int hits) const {
             } 
         }
         
-        cout << num_passed_blocks << " / " << num_blocks << " blocks passed" << endl;
+        // cout << num_passed_blocks << " / " << num_blocks << " blocks passed" << endl;
     
         if (num_passed_blocks / num_blocks >= 0.9) {
             file.close();
