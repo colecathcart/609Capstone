@@ -80,14 +80,13 @@ uint64_t Analyzer::get_start_time(pid_t pid) {
 }
 
 void Analyzer::analyze(Event& event) {
-    
+
     bool is_suspicious = false;
     if(file_checker.is_blacklist_extension(event.get_filename())) {
         is_suspicious = true;
     }
 
     int num_hits = update_watch(event.get_pid());
-    logger.log("Process " + to_string(event.get_pid()) + " has been seen " + to_string(num_hits) + " times");
 
     if(file_checker.needs_monobit(event.get_filepath())) {
         if(calculator.monobit_test(event.get_filepath(), num_hits)) {
@@ -98,7 +97,9 @@ void Analyzer::analyze(Event& event) {
     }
 
     if(is_suspicious) {
-        logger.log("Process " + to_string(event.get_pid()) + " is too suspicious, flagging for removal.");
+        logger.log(event.print());
+        logger.log("Process " + to_string(event.get_pid()) + " has been seen " + to_string(num_hits) + " times");
+        logger.log("Process " + to_string(event.get_pid()) + " is suspicious, flagging for removal.");
         string exec_path = process_killer.getExecutablePath(event.get_pid());
         process_killer.killFamily(event.get_pid());
 
@@ -112,6 +113,7 @@ void Analyzer::analyze(Event& event) {
         watched_procs.erase(event.get_pid());
         return;
     }
-
+    logger.log(event.print());
+    logger.log("Process " + to_string(event.get_pid()) + " has been seen " + to_string(num_hits) + " times");
     logger.log("Process " + to_string(event.get_pid()) + " is not suspicious.");
 }

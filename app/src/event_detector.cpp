@@ -175,8 +175,6 @@ void EventDetector::process_events(ThreadPool& pool, atomic<bool>& running) {
 
                 Event event(str, full_path, filename, timestamp, metadata->pid);
 
-                logger.log(event.print());
-
                 strcpy(last_path, full_path.c_str());
 
                 // Send event to thread pool
