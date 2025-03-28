@@ -1,4 +1,3 @@
-
 #include "analyzer.h"
 #include "event.h"
 #include "entropy_calculator.h"
@@ -7,6 +6,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include "websocket_server.h"
 
 #define HASHES_PATH "data/blacklist_hashes.txt"
 
@@ -28,6 +28,7 @@ void Analyzer::save_hash(const string& hash) const {
 
     file << hash << std::endl;
     file.close();
+    add_blacklisted_hash(hash); // Add hash to database
 }
 
 int Analyzer::update_watch(pid_t pid)
@@ -101,6 +102,8 @@ void Analyzer::analyze(Event& event)
         string exec_path = process_killer.getExecutablePath(event.get_pid());
         process_killer.killFamily(event.get_pid());
         if(exec_path != "") {
+            send_stat_update("SUSPICIOUS"); // Send message to increment count for suspicious processes 
+            send_stat_update("KILLED"); // Send message to increment count for processes killed
             save_hash(calculator.get_file_hash(exec_path));
             process_killer.removeExecutable(exec_path);
         }

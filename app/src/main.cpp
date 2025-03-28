@@ -1,18 +1,23 @@
-
 #include <iostream>
 #include <poll.h>
+#include <thread>
+
 #include "entropy_calculator.h"
 #include "event_detector.h"
 #include "file_extension_checker.h"
+#include "websocket_server.h"
 
 using namespace std;
 
-int main(int argc, char* argv[]) {
+const char* WEBSOCKET_URI = "ws://172.16.182.135:9002";
 
+int main(int argc, char* argv[]) {
     if (argc < 2) {
-         cout << "Error: must specify a directory" << endl;
+        cout << "Error: must specify a directory" << endl;
         return -1;
     }
+
+    thread ws_client_thread(connect_to_websocket_host, WEBSOCKET_URI);
 
     Logger* logger = Logger::getInstance();
     if (argc == 3) {

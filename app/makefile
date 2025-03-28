@@ -1,44 +1,56 @@
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -Wall -Iinclude
-LDFLAGS = -lssl -lcrypto -lmagic
+CXXFLAGS = -Wall -Iinclude -Ithird_party/websocketpp
+LDFLAGS = -lssl -lcrypto -lmagic -lsqlite3
 LDLIBS = -lgtest -pthread
 
 # Source files
-SRC = src/main.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp src/event.cpp src/event_detector.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp
+SRC = src/main.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp src/event.cpp \
+      src/event_detector.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp \
+      src/websocket_server.cpp
 
-# Object files (will be placed in the current directory)
+# Object files
 OBJ = $(SRC:src/%.cpp=%.o)
 
-# Target executables
+# Executables
 APP = ransomware_detector
 TEST_APP = test_app
+WS_APP = websocket_server_app
 
 # Default target
 all: $(APP)
 
-# Build the main application
+# Build main application
 $(APP): $(OBJ)
 	$(CXX) $(OBJ) $(LDFLAGS) -o $(APP)
 
-# Build the test application
-test: $(SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp
-	$(CXX) $(SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp $(LDFLAGS) $(LDLIBS) -o $(TEST_APP)
+# Build websocket_server_app
+$(WS_APP): websocket_main.o websocket_server.o
+	$(CXX) websocket_main.o websocket_server.o $(LDFLAGS) -lpthread -o $(WS_APP)
+
+# Test runner
+test: $(SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp \
+      tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp
+	$(CXX) $(SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp \
+	tests/test_file_extension_checker.cpp tests/test_event_detector.cpp \
+	tests/test_analyzer.cpp tests/test_process_killer.cpp $(LDFLAGS) $(LDLIBS) -o $(TEST_APP)
 	sudo ./$(TEST_APP)
 
-# General rule for compiling .cpp to .o (creates .o files in the current directory)
+# Pattern rule for compiling source files
 %.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Clean up the build
-remove:
-	rm -f $(OBJ) $(APP) $(TEST_APP)
+# Special rule for websocket_main.o (not in src/)
+websocket_main.o: src/websocket_main.cpp
+	$(CXX) $(CXXFLAGS) -c src/websocket_main.cpp -o websocket_main.o
 
-# Clean up everything including .o files
+# Clean targets
+remove:
+	rm -f $(OBJ) websocket_main.o $(APP) $(TEST_APP) $(WS_APP)
+
 remove_objects:
-	rm -f $(OBJ)
+	rm -f $(OBJ) websocket_main.o
 
 no_obj: all remove_objects
 
-# Clean target
 clean: remove
