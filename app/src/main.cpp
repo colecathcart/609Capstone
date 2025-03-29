@@ -9,7 +9,7 @@
 
 using namespace std;
 
-const char* WEBSOCKET_URI = "ws://172.16.182.135:9002";
+#define WEBSOCKET_URI "ws://localhost:9002"
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
