@@ -9,30 +9,30 @@
 #include "websocket_server.h"
 
 #define HASHES_PATH "data/blacklist_hashes.txt"
+#define IGNORE_THRESHOLD 30
 
 using namespace std;
 
 Analyzer::Analyzer()
-    : calculator(EntropyCalculator()), file_checker(FileExtensionChecker()), process_killer(ProcessKiller())
+    : calculator(EntropyCalculator()), file_checker(FileExtensionChecker()), process_killer(ProcessKiller()), logger(Logger::getInstance())
 {
-    logger = Logger::getInstance();
 }
 
 void Analyzer::save_hash(const string& hash) const {
+
     ofstream file(HASHES_PATH, ios::app);
-    //cout << hash << endl;
     if (!file.is_open()) {
-        logger->log("Error opening file for storing hash!");
+        logger.log("Error opening file for storing hash!");
         return;
     }
-
     file << hash << std::endl;
     file.close();
     add_blacklisted_hash(hash); // Add hash to database
 }
 
-int Analyzer::update_watch(pid_t pid)
-{
+int Analyzer::update_watch(pid_t pid) {
+    lock_guard<mutex> lock(watch_mutex);
+
     uint64_t start_time = get_start_time(pid);
     if(watched_procs.find(pid) != watched_procs.end()) {
         if(watched_procs[pid].time == start_time) {
@@ -48,11 +48,12 @@ int Analyzer::update_watch(pid_t pid)
 }
 
 uint64_t Analyzer::get_start_time(pid_t pid) {
+    lock_guard<mutex> lock(procfile_mutex);
     string stat_file = "/proc/" + std::to_string(pid) + "/stat";
     ifstream file(stat_file);
     
     if (!file.is_open()) {
-        logger->log("Unable to open stat file for PID: " + to_string(pid));
+        logger.log("Unable to open stat file for PID: " + to_string(pid));
         return -1;
     }
 
@@ -79,15 +80,18 @@ uint64_t Analyzer::get_start_time(pid_t pid) {
     return start_time;
 }
 
-void Analyzer::analyze(Event& event)
-{
+void Analyzer::analyze(Event& event) {
+
+    int num_hits = update_watch(event.get_pid());
+
+    if(num_hits > IGNORE_THRESHOLD) {
+        return;
+    }
+
     bool is_suspicious = false;
     if(file_checker.is_blacklist_extension(event.get_filename())) {
         is_suspicious = true;
     }
-
-    int num_hits = update_watch(event.get_pid());
-    logger->log("Process " + to_string(event.get_pid()) + " has been seen " + to_string(num_hits) + " times");
 
     if(file_checker.needs_monobit(event.get_filepath())) {
         if(calculator.monobit_test(event.get_filepath(), num_hits)) {
@@ -98,9 +102,13 @@ void Analyzer::analyze(Event& event)
     }
 
     if(is_suspicious) {
-        logger->log("Process " + to_string(event.get_pid()) + " is too suspicious, flagging for removal.");
+        logger.log(event.print());
+        logger.log("Process " + to_string(event.get_pid()) + " has been seen " + to_string(num_hits) + " times");
+        logger.log("Process " + to_string(event.get_pid()) + " is suspicious, flagging for removal.");
         string exec_path = process_killer.getExecutablePath(event.get_pid());
         process_killer.killFamily(event.get_pid());
+
+        lock_guard<mutex> lock(analyzer_mutex);
         if(exec_path != "") {
             send_stat_update("SUSPICIOUS"); // Send message to increment count for suspicious processes 
             send_stat_update("KILLED"); // Send message to increment count for processes killed
@@ -110,6 +118,7 @@ void Analyzer::analyze(Event& event)
         watched_procs.erase(event.get_pid());
         return;
     }
-
-    logger->log("Process " + to_string(event.get_pid()) + " is not suspicious.");
+    logger.log(event.print());
+    logger.log("Process " + to_string(event.get_pid()) + " has been seen " + to_string(num_hits) + " times");
+    logger.log("Process " + to_string(event.get_pid()) + " is not suspicious.");
 }

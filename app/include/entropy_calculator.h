@@ -61,13 +61,13 @@ class EntropyCalculator
          */
         const size_t buffer_size;
         /**
-         * @brief All valid base64 characters for checking encoding
+         * @brief All valid base64 characters, along with their positions, for efficiently decoding
          */
         static const unordered_map<BYTE, int> base64_set;
         /**
          * @brief Reference to singleton logger
          */
-        Logger* logger;
+        Logger& logger;
         /**
          * @brief Helper function to ignore small files (< 1 KB)
          */

@@ -52,38 +52,35 @@ class Analyzer
          * @brief A map holding trusted procs with their creation time and number of hits
          */
         unordered_map<pid_t, Process> watched_procs;
-
         /**
          * @brief An instance of EntropyCalculator for determining encryption
          */
         EntropyCalculator calculator;
-
         /**
          * @brief An instance of FileExtensionChecker for determining file type
          */
         FileExtensionChecker file_checker;
-
         /**
          * @brief An instance of ProcessKiller for ending suspicous processes
          */
         ProcessKiller process_killer;
-
         /**
-         * @brief reference to singleton logger
+         * @brief Reference to singleton logger
          */
-        Logger* logger;
-
+        Logger& logger;
+        /**
+         * @brief Mutexes for thread safety
+         */
+        mutable mutex analyzer_mutex, watch_mutex, procfile_mutex;
         /**
          * @brief Function to update the process watchlist for the given pid
          * @return The number of times this process has been seen.
          */
         int update_watch(pid_t pid);
-
         /**
          * @brief Helper function to save hash to a file
          */
         void save_hash(const string& hash) const;
-
         /**
          * @brief Helper function to get process start time
          */

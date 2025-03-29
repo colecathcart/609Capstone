@@ -17,9 +17,13 @@ class ProcessKiller {
 private:
 
     /**
-     * @brief Singleton logger instance
+     * @brief Singleton logger reference
      */
-    Logger* logger;
+    Logger& logger;
+    /**
+     * @brief Mutex for thread safety
+     */
+    mutable mutex file_mutex;
 
 protected:
 
@@ -40,7 +44,7 @@ public:
      * @brief Kills the process and its process group.
      * @return True if the process group was successfully terminated, false otherwise.
      */
-    bool killFamily(pid_t pid);
+    bool killFamily(pid_t pid) const;
 
     /**
      * @brief Retrieves the executable path of the process.

@@ -8,8 +8,6 @@
 
 using namespace std;
 
-Logger* Logger::logger = nullptr;
-
 Logger::Logger(): whereto(0) {
     const char* mqPath = "/guiMQ";
     struct mq_attr attr;
@@ -36,18 +34,19 @@ Logger::~Logger() {
     mq_close(mq);
 }
 
-Logger* Logger::getInstance() {
-    if (logger == nullptr) {
-        logger = new Logger();
-    }
-    return logger;
+Logger& Logger::getInstance() {
+
+    static Logger instance;
+    return instance;
 }
 
 void Logger::set_destination(int where) {
+    lock_guard<mutex> lock(logger_mutex);
     whereto = where;
 }
 
 void Logger::log(const string& message) {
+    lock_guard<mutex> lock(logger_mutex);
     if(whereto == 0) {
         cout << message << endl;
     }else if(whereto == 1) {

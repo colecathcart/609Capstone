@@ -15,6 +15,7 @@
 #include <linux/limits.h>
 #include "event.h"
 #include "analyzer.h"
+#include "thread_pool.h"
 
 using namespace std;
 
@@ -25,10 +26,7 @@ class EventDetector {
 private:
     int fanotify_fd; ///< File descriptor for fanotify instance
     int ret;         ///< Return value for system calls
-    queue<Event> event_queue; ///< Queue to store recent events
-    size_t max_queue_size = 100; ///< Maximum number of stored events
-    Analyzer analyzer; ///< For passing events to
-    Logger* logger; ///< Reference to singleton logger
+    Logger& logger; ///< Reference to singleton logger
     unordered_set<string> whitelist_dirs; ///< Set of whitelisted directories
 
 public:
@@ -51,13 +49,7 @@ public:
     /**
      * @brief Processes incoming fanotify events and extracts relevant information.
      */
-    void process_events();
-
-    /**
-     * @brief Stores an event in the event queue, maintaining a fixed queue size.
-     * @param event The event to be stored.
-     */
-    void enqueue_event(const Event &event);
+    void process_events(ThreadPool& pool, atomic<bool>& running);
 
     /**
      * @brief Retrieves the fanotify file descriptor.
