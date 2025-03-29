@@ -12,7 +12,7 @@
 
 using namespace std;
 
-const char* WEBSOCKET_URI = "ws://172.16.182.135:9002";
+#define WEBSOCKET_URI "ws://localhost:9002"
 atomic<bool> running(true);
 
 void signal_handler(int signal) {
