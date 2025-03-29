@@ -1,2 +1,5 @@
 /tmp/
 /var/spool/
+/var/lib/apt
+/var/lib/dpkg
+/var/cache/apt

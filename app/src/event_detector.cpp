@@ -70,11 +70,11 @@ bool EventDetector::is_hidden_path(const string& path) {
     return false;
 }
 
-bool EventDetector::is_whitelist_path(const std::string &path) {
+bool EventDetector::is_whitelist_path(const string &path) {
     
     size_t pos = path.rfind('/');
     string path_without_file = path;
-    if (pos != std::string::npos) {
+    if (pos != string::npos) {
         path_without_file = path_without_file.substr(0, pos + 1);
     }
     

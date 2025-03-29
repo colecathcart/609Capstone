@@ -25,7 +25,9 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    std::signal(SIGINT, signal_handler);
+    signal(SIGINT, signal_handler);
+    signal(SIGTERM, signal_handler);
+
 
     thread ws_client_thread(connect_to_websocket_host, WEBSOCKET_URI);
 
@@ -37,7 +39,6 @@ int main(int argc, char* argv[]) {
 
     unsigned int num_threads = thread::hardware_concurrency() - 1;
     if (num_threads < 1) {num_threads = 1;};
-    cout << "threads" << num_threads << endl;
     ThreadPool pool(num_threads);
 
     EventDetector detector;

@@ -9,6 +9,7 @@
 #include "websocket_server.h"
 
 #define HASHES_PATH "data/blacklist_hashes.txt"
+#define IGNORE_THRESHOLD 30
 
 using namespace std;
 
@@ -81,12 +82,16 @@ uint64_t Analyzer::get_start_time(pid_t pid) {
 
 void Analyzer::analyze(Event& event) {
 
+    int num_hits = update_watch(event.get_pid());
+
+    if(num_hits > IGNORE_THRESHOLD) {
+        return;
+    }
+
     bool is_suspicious = false;
     if(file_checker.is_blacklist_extension(event.get_filename())) {
         is_suspicious = true;
     }
-
-    int num_hits = update_watch(event.get_pid());
 
     if(file_checker.needs_monobit(event.get_filepath())) {
         if(calculator.monobit_test(event.get_filepath(), num_hits)) {
