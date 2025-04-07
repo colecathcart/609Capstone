@@ -67,6 +67,21 @@ TEST_F(EntropyCalculatorTest, MonobitTestUnencryptedZip) {
     ASSERT_FALSE(result) << "Expected monobit test to fail for unencrypted ZIP file";
 }
 
+// Test that small file is ignored
+TEST_F(EntropyCalculatorTest, SmallFileIsIgnored) {
+    string small_file = plain_text;
+
+    bool result = calculator.calc_shannon_entropy(small_file, 1);
+    EXPECT_FALSE(result) << "Small file should be ignored and return false";
+}
+
+// Test that file hash generated is of length 64
+TEST_F(EntropyCalculatorTest, FileHashGeneration) {
+    string hash = calculator.get_file_hash(encrypted_text);
+    EXPECT_FALSE(hash.empty()) << "Hash should not be empty for valid file";
+    EXPECT_EQ(hash.length(), 64) << "SHA256 hash should be 64 hex characters";
+}
+
 // Benchmark test for 100mb file entropy calculation
 TEST_F(EntropyCalculatorTest, LargeFileEntropyBenchmark) {
     auto start = high_resolution_clock::now();
@@ -78,22 +93,8 @@ TEST_F(EntropyCalculatorTest, LargeFileEntropyBenchmark) {
 
     double speed = file_size_mb / (duration / 1000.0);
 
-    cout << "File entropy calculation based on first 100mb of a file took " << duration << " ms (" << speed << " MB/s)" << endl;
+    cout << "File entropy calculation based on first 100mb of a large file took " << duration << " ms (" << speed << " MB/s)" << endl;
 
     EXPECT_GT(entropy, 0) << "Entropy calculation should complete successfully";
-}
-
-TEST_F(EntropyCalculatorTest, SmallFileIsIgnored) {
-    string small_file = plain_text;
-
-    bool result = calculator.calc_shannon_entropy(small_file, 1);
-    EXPECT_FALSE(result) << "Small file should be ignored and return false";
-}
-
-
-TEST_F(EntropyCalculatorTest, FileHashGeneration) {
-    string hash = calculator.get_file_hash(encrypted_text);
-    EXPECT_FALSE(hash.empty()) << "Hash should not be empty for valid file";
-    EXPECT_EQ(hash.length(), 64) << "SHA256 hash should be 64 hex characters";
 }
 
