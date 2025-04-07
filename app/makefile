@@ -11,10 +11,10 @@ SRC = src/main.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp src
 
 TEST_SRC = src/entropy_calculator.cpp src/file_extension_checker.cpp src/event.cpp \
            src/event_detector.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp \
-           src/websocket_server.cpp
+           src/websocket_server.cpp src/thread_pool.cpp
 
-# Object files
-OBJ = $(SRC:src/%.cpp=%.o)
+# Object files (store in build/)
+OBJ = $(SRC:src/%.cpp=build/%.o)
 
 # Executables
 APP = ransomware_detector
@@ -24,13 +24,16 @@ WS_APP = websocket_server_app
 # Default target
 all: $(APP)
 
+# Ensure build directory exists
+$(shell mkdir -p build)
+
 # Build main application
 $(APP): $(OBJ)
 	$(CXX) $(OBJ) $(LDFLAGS) -o $(APP)
 
 # Build websocket_server_app
-$(WS_APP): websocket_main.o websocket_server.o
-	$(CXX) websocket_main.o websocket_server.o $(LDFLAGS) -lpthread -o $(WS_APP)
+$(WS_APP): build/websocket_main.o build/websocket_server.o
+	$(CXX) build/websocket_main.o build/websocket_server.o $(LDFLAGS) -lpthread -o $(WS_APP)
 
 # Test runner
 test: $(TEST_SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp \
@@ -41,19 +44,21 @@ test: $(TEST_SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp tests/te
 	sudo ./$(TEST_APP)
 
 # Pattern rule for compiling source files
-%.o: src/%.cpp
+build/%.o: src/%.cpp
+	@mkdir -p build
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Special rule for websocket_main.o (not in src/)
-websocket_main.o: src/websocket_main.cpp
-	$(CXX) $(CXXFLAGS) -c src/websocket_main.cpp -o websocket_main.o
+build/websocket_main.o: src/websocket_main.cpp
+	@mkdir -p build
+	$(CXX) $(CXXFLAGS) -c src/websocket_main.cpp -o build/websocket_main.o
 
 # Clean targets
 remove:
-	rm -f $(OBJ) websocket_main.o $(APP) $(TEST_APP) $(WS_APP)
+	rm -f build/*.o $(APP) $(TEST_APP) $(WS_APP)
 
 remove_objects:
-	rm -f $(OBJ) websocket_main.o
+	rm -f build/*.o
 
 no_obj: all remove_objects
 
