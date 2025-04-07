@@ -88,13 +88,8 @@ TEST_F(AnalyzerTest, WhitelistedHighEntropyExtensionPassesMonobitTest) {
 TEST_F(AnalyzerTest, SmallFileIsIgnored) {
     time_t now = time(nullptr);
 
-    string path = "tests/test_files/small_file.txt";
-    ofstream file(path);
-    file << "abc";  // Less than 1KB
-    file.close();
-
     Event event("FAN_CLOSE_WRITE",
-                path,
+                "tests/test_files/small_file.txt",
                 "small_file.txt",
                 now,
                 1010);

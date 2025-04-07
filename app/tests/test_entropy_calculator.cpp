@@ -17,6 +17,7 @@ class EntropyCalculatorTest : public ::testing::Test {
         string plain_compressed = "tests/test_files/plain_compressed.zip";
         string encrypted_compressed = "tests/test_files/encrypted_compressed.zip";
         string large_test_file = "tests/test_files/large_test_file.bin";
+        string small_file = "tests/test_files/small_file.txt";
 };
 
 // Test entropy for encrypted text file 
@@ -69,8 +70,6 @@ TEST_F(EntropyCalculatorTest, MonobitTestUnencryptedZip) {
 
 // Test that small file is ignored
 TEST_F(EntropyCalculatorTest, SmallFileIsIgnored) {
-    string small_file = plain_text;
-
     bool result = calculator.calc_shannon_entropy(small_file, 1);
     EXPECT_FALSE(result) << "Small file should be ignored and return false";
 }
