@@ -2,6 +2,7 @@
 app/app
 app/ransomware_detector
 app/websocket_server_app
+app/build/*
 **/*.o
 
 encryption_zone/files2encrypt

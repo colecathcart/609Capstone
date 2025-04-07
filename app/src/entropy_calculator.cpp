@@ -160,7 +160,9 @@ bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) c
         }
 
         vector<BYTE> decoded_buffer = decode(buffer, bytes_read);
-        bytes_read = decoded_buffer.size();
+        if(decoded_buffer.size() < bytes_read) {
+            bytes_read = decoded_buffer.size();
+        }
 
         for (size_t i = 0; i < bytes_read; i++) {
             frequencies[decoded_buffer[i]]++;
@@ -171,8 +173,6 @@ bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) c
             double probability = static_cast<double>(pair.second) / bytes_read;
             entropy -= probability * log2(probability);
         }
-
-        // cout << "Entropy: " << entropy << endl;
 
         if (entropy > 7.5) {
             file.close();
