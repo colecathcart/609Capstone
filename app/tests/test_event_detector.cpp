@@ -20,10 +20,10 @@ TEST_F(EventDetectorTest, HiddenPathDetection) {
 // Test non concerning path detection
 TEST_F(EventDetectorTest, NoConcernPathDetection) {
     // Paths in /tmp/ or /var/spool/ should be ignored.
-    EXPECT_TRUE(ed.is_no_concern_path("/tmp/somefile.txt"));
-    EXPECT_TRUE(ed.is_no_concern_path("/var/spool/print"));
+    EXPECT_TRUE(ed.is_whitelist_path("/tmp/somefile.txt"));
+    EXPECT_TRUE(ed.is_whitelist_path("/var/spool/print"));
     // Paths outside these directories should not be flagged.
-    EXPECT_FALSE(ed.is_no_concern_path("/home/user/somefile.txt"));
+    EXPECT_FALSE(ed.is_whitelist_path("/home/user/somefile.txt"));
 }
 
 // Test returning the fanotify file descriptor
@@ -36,7 +36,7 @@ TEST_F(EventDetectorTest, ValidFanotifyFd) {
 // Test enqueuing an event
 TEST_F(EventDetectorTest, EnqueueEventWorks) {
     // Create a dummy event.
-    Event testEvent("TEST", "/tmp/test.txt", "test.txt", "txt", time(nullptr), 1234);
+    Event testEvent("TEST", "/tmp/test.txt", "test.txt", time(nullptr), 1234);
     // Ensure that enqueue_event does not throw any exceptions.
     ASSERT_NO_THROW(ed.enqueue_event(testEvent));
 }

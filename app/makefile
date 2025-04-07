@@ -9,6 +9,10 @@ SRC = src/main.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp src
       src/event_detector.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp \
       src/websocket_server.cpp
 
+TEST_SRC = src/entropy_calculator.cpp src/file_extension_checker.cpp src/event.cpp \
+           src/event_detector.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp \
+           src/websocket_server.cpp
+
 # Object files
 OBJ = $(SRC:src/%.cpp=%.o)
 
@@ -29,9 +33,9 @@ $(WS_APP): websocket_main.o websocket_server.o
 	$(CXX) websocket_main.o websocket_server.o $(LDFLAGS) -lpthread -o $(WS_APP)
 
 # Test runner
-test: $(SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp \
+test: $(TEST_SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp \
       tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp
-	$(CXX) $(SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp \
+	$(CXX) $(CXXFLAGS) $(TEST_SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp \
 	tests/test_file_extension_checker.cpp tests/test_event_detector.cpp \
 	tests/test_analyzer.cpp tests/test_process_killer.cpp $(LDFLAGS) $(LDLIBS) -o $(TEST_APP)
 	sudo ./$(TEST_APP)
