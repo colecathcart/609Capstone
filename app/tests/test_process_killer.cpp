@@ -29,7 +29,7 @@ TEST_F(ProcessKillerTest, GetExecutablePathValid) {
 
 // Test that getExecutablePath returns an empty string for an invalid PID
 TEST_F(ProcessKillerTest, GetExecutablePathInvalid) {
-    // Use an unlikely PID (adjust if necessary)
+    // Use an unlikely PID
     pid_t invalid_pid = 999999;
     string path = pk.getExecutablePath(invalid_pid);
     EXPECT_TRUE(path.empty());

@@ -34,10 +34,10 @@ $(WS_APP): websocket_main.o websocket_server.o
 
 # Test runner
 test: $(TEST_SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp \
-      tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp
+      tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp tests/test_logger.cpp
 	$(CXX) $(CXXFLAGS) $(TEST_SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp \
 	tests/test_file_extension_checker.cpp tests/test_event_detector.cpp \
-	tests/test_analyzer.cpp tests/test_process_killer.cpp $(LDFLAGS) $(LDLIBS) -o $(TEST_APP)
+	tests/test_analyzer.cpp tests/test_process_killer.cpp tests/test_logger.cpp $(LDFLAGS) $(LDLIBS) -o $(TEST_APP)
 	sudo ./$(TEST_APP)
 
 # Pattern rule for compiling source files
