@@ -26,19 +26,17 @@ const unordered_map<BYTE, int> EntropyCalculator::base64_set = {
     {'3', 55}, {'4', 56}, {'5', 57}, {'6', 58}, {'7', 59}, {'8', 60}, {'9', 61}, {'+', 62}, {'/', 63}, 
 };
 
-EntropyCalculator::EntropyCalculator(): buffer_size(1024) {
-    logger = Logger::getInstance();
+EntropyCalculator::EntropyCalculator(): buffer_size(1024), logger(Logger::getInstance()) {
 }
 
-EntropyCalculator::EntropyCalculator(int buff_size_kb): buffer_size(buff_size_kb * 1024) {
-    logger = Logger::getInstance();
+EntropyCalculator::EntropyCalculator(int buff_size_kb): buffer_size(buff_size_kb * 1024), logger(Logger::getInstance()) {
 }
 
 bool EntropyCalculator::is_small_file(const string& filepath) const {
     ifstream file(filepath, ios::binary);
 
     if (!file.is_open()) {
-        logger->log("Error opening file");
+        logger.log("Error opening file");
         return -1;
     }
 
@@ -115,14 +113,14 @@ vector<BYTE> EntropyCalculator::decode(vector<BYTE>& buffer, size_t length) cons
 
 bool EntropyCalculator::calc_shannon_entropy(const string& filepath, int hits) const {
     if(is_small_file(filepath)) {
-        logger->log("ignoring small file");
+        logger.log("ignoring small file");
         return false;
     }
 
     ifstream file(filepath, ios::binary);
     
     if (!file.is_open()) {
-        logger->log("Error opening file");
+        logger.log("Error opening file");
         return -1;
     }
 
@@ -196,7 +194,7 @@ bool EntropyCalculator::monobit_test(const string& filepath, int hits) const {
     ifstream file(filepath, ios::binary);
 
     if(!file) {
-        logger->log("Error opening file");
+        logger.log("Error opening file");
         return 1;
     }
 
@@ -292,18 +290,18 @@ bool EntropyCalculator::monobit_test(const string& filepath, int hits) const {
 string EntropyCalculator::get_file_hash(const string& filepath) const {
     ifstream file(filepath, ios::binary);
     if (!file) {
-        logger->log("Couldn't open file for generating hash");
+        logger.log("Couldn't open file for generating hash");
         return "";
     }
     
     EVP_MD_CTX* ctx = EVP_MD_CTX_new();
     if (ctx == nullptr) {
-        logger->log("Error initializing EVP context.");
+        logger.log("Error initializing EVP context.");
         return "";
     }
 
     if (EVP_DigestInit_ex(ctx, EVP_sha256(), nullptr) != 1) {
-        logger->log("Error initializing SHA-256.");
+        logger.log("Error initializing SHA-256.");
         EVP_MD_CTX_free(ctx);
         return "";
     }
@@ -312,14 +310,14 @@ string EntropyCalculator::get_file_hash(const string& filepath) const {
     char buffer[bufferSize];
     while (file.read(buffer, bufferSize)) {
         if (EVP_DigestUpdate(ctx, buffer, file.gcount()) != 1) {
-            logger->log("Error updating SHA-256 hash.");
+            logger.log("Error updating SHA-256 hash.");
             EVP_MD_CTX_free(ctx);
             return "";
         }
     }
     if (file.gcount() > 0) {
         if (EVP_DigestUpdate(ctx, buffer, file.gcount()) != 1) {
-            logger->log("Error updating SHA-256 hash.");
+            logger.log("Error updating SHA-256 hash.");
             EVP_MD_CTX_free(ctx);
             return "";
         }
@@ -330,7 +328,7 @@ string EntropyCalculator::get_file_hash(const string& filepath) const {
     unsigned char hash[EVP_MAX_MD_SIZE];
     unsigned int hashLen;
     if (EVP_DigestFinal_ex(ctx, hash, &hashLen) != 1) {
-        logger->log("Error updating SHA-256 hash.");
+        logger.log("Error updating SHA-256 hash.");
         EVP_MD_CTX_free(ctx);
         return "";
     }

@@ -19,6 +19,8 @@ public:
     Event(const string& type, const string& path, 
           const string& name, time_t timestamp, pid_t pid);
 
+    Event();
+
     string get_event_type() const;
     string get_filepath() const;
     string get_filename() const;

@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <string>
 #include <magic.h>
+#include <mutex>
 
 using namespace std;
 
@@ -55,18 +56,13 @@ class FileExtensionChecker
          */
         static const unordered_set<string> bad_extensions;
         /**
-         * @brief A set of whitelisted directories.
-         */
-        static const unordered_set<string> good_dirs;
-        /**
-         * @brief A set of whitelisted packages.
-         */
-        static const unordered_set<string> good_packages;
-        /**
          * @brief Pointer to a cookie in the magic database
          */
         magic_t magic;
-
+        /**
+         * @brief Mutex for thread safety when using libmagic
+         */
+        mutable mutex magic_mutex;
         /**
          * @brief Returns an extension of a file.
          * @param filepath The path to the file.

@@ -7,7 +7,7 @@ LDLIBS = -lgtest -pthread
 # Source files
 SRC = src/main.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp src/event.cpp \
       src/event_detector.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp \
-      src/websocket_server.cpp
+      src/websocket_server.cpp src/thread_pool.cpp
 
 TEST_SRC = src/entropy_calculator.cpp src/file_extension_checker.cpp src/event.cpp \
            src/event_detector.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp \

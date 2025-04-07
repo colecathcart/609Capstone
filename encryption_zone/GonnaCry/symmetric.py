@@ -22,6 +22,8 @@ class AESCipher(object):
         raw = self._pad(raw)
         iv = Random.new().read(AES.block_size)
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        
+        # AES encryption, then Base64 encoding:
         return base64.b64encode(iv + cipher.encrypt(raw))
 
     def decrypt(self, enc, decryption_key=None):

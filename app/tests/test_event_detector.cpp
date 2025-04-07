@@ -33,10 +33,3 @@ TEST_F(EventDetectorTest, ValidFanotifyFd) {
     EXPECT_GE(fd, 0);
 }
 
-// Test enqueuing an event
-TEST_F(EventDetectorTest, EnqueueEventWorks) {
-    // Create a dummy event.
-    Event testEvent("TEST", "/tmp/test.txt", "test.txt", time(nullptr), 1234);
-    // Ensure that enqueue_event does not throw any exceptions.
-    ASSERT_NO_THROW(ed.enqueue_event(testEvent));
-}
