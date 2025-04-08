@@ -52,7 +52,6 @@ public:
     /**
      * @brief Log a message to a variety of outputs (stdout by default)
      * @param message The message to log
-     * @param whereto Where to log the message: 0 = stdout, 1 = logfile, 2 = fifo pipe, 3 = all
      */
     void log(const string& message);
 };

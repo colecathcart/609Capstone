@@ -46,7 +46,7 @@ bool ProcessKiller::killFamily(pid_t pid) const {
 bool ProcessKiller::promptUserForExecutableRemoval(const string& ransomware_path) const {
 
     // Prompt the user for executable deletion using Zenity
-    string command = "zenity --question --text='A potentially malicious executable was found at " 
+    string command = "DISPLAY=:0 zenity --question --text='A potentially malicious executable was found at " 
                      + ransomware_path + ". Do you want to delete it?' --title='Suspicious File Detected' 2>/dev/null";
     int result = system(command.c_str());
     return (result == 0);

@@ -10,7 +10,6 @@ using namespace std;
 
 /**
  * @brief A class for verifying file extensions.
- * @author Rana El Sadig
  */
 class FileExtensionChecker
 {
@@ -32,18 +31,6 @@ class FileExtensionChecker
          * @param filepath The path to the file to be tested.
          */
         bool is_blacklist_extension(const string& filepath) const;
-    
-        /**
-         * @brief Checks if a directory path is whitelisted.
-         * @param filepath The path to the directory to be tested.
-         */
-        bool is_whitelist_dir(const string& dirpath) const;
-
-        /**
-         * @brief Checks if a package is whitelisted.
-         * @param filepath The path to the file to be tested.
-         */
-        bool is_whitelist_package(const string& filepath) const;
 
     private:
 
