@@ -2,9 +2,13 @@
 
 A software application that detects and removes ransomware on Linux (Ubuntu) systems.
 
-An application demo as of March 10th, 2025 is available at this link:
+An application demo of the modified GonnaCry ransomware is available at this link:
 
-[Demo Video](https://drive.google.com/file/d/1_kg18xHsj8cp9Rjf7lbe5lF6xD2rqKeS/view?usp=sharing)
+[Ransomware Demo](https://drive.google.com/file/d/1hIWWA_ZhmGaZqhzdlf3ynPu0LOJaWLPk/view?usp=sharing)
+
+An demo of the same ransomware being stopped by the detector is available at this link:
+
+[Detector Demo](https://drive.google.com/file/d/1rDO_HqtsSHD4BkOUQF_5ZmCVJdJY73wC/view?usp=sharing)
 
 ## Project Structure
 

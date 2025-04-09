@@ -14,8 +14,7 @@ using namespace std;
 
 /**
  * @brief Class to analyze events emitted by the EventDetector. Holds
- * a table of suspicious processes to track repeat offenders that need
- * to be killed
+ * a table of seen processes to track repeated hits for scaling up entropy calculations.
  */
 class Analyzer
 {
@@ -37,7 +36,7 @@ class Analyzer
 
         /**
          * @brief Struct for holding process info for process tracking
-         * @param time The start time of the process
+         * @param time The start time of the process.
          * @param hits The number of times this process has been seen
          */
         struct Process {
@@ -49,7 +48,7 @@ class Analyzer
         };
 
         /**
-         * @brief A map holding trusted procs with their creation time and number of hits
+         * @brief A map holding seen processes with their creation time and number of hits
          */
         unordered_map<pid_t, Process> watched_procs;
         /**
@@ -78,11 +77,11 @@ class Analyzer
          */
         int update_watch(pid_t pid);
         /**
-         * @brief Helper function to save hash to a file
+         * @brief Helper function to save file hash to a file
          */
         void save_hash(const string& hash) const;
         /**
-         * @brief Helper function to get process start time
+         * @brief Helper function to get process start time from a process stat file
          */
         uint64_t get_start_time(pid_t pid);
 

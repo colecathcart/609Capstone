@@ -23,11 +23,6 @@ using namespace std;
  * @brief Class to monitor file system events using fanotify.
  */
 class EventDetector {
-private:
-    int fanotify_fd; ///< File descriptor for fanotify instance
-    int ret;         ///< Return value for system calls
-    Logger& logger; ///< Reference to singleton logger
-    unordered_set<string> whitelist_dirs; ///< Set of whitelisted directories
 
 public:
     /**
@@ -48,6 +43,8 @@ public:
 
     /**
      * @brief Processes incoming fanotify events and extracts relevant information.
+     * @param pool The thread pool to send events to for processing.
+     * @param running Atomic switch to shut down threads.
      */
     void process_events(ThreadPool& pool, atomic<bool>& running);
 
@@ -57,6 +54,24 @@ public:
      */
     int get_fanotify_fd() const;
 
+private:
+    /**
+     * @brief File descriptor for fanotify instance
+     */
+    int fanotify_fd;
+    /**
+     * @brief Return value for system calls
+     */
+    int ret;
+    /**
+     * @brief Reference to singleton logger
+     */
+    Logger& logger;
+    /**
+     * @brief Set of whitelisted directories
+     */
+    unordered_set<string> whitelist_dirs;
+
     /**
      * @brief Checks if the specified path is hidden.
      * @param path The path to check.
@@ -65,11 +80,11 @@ public:
     bool is_hidden_path(const string &path);
 
     /**
-     * @brief Checks if the specified path is not a concern, like /tmp or /var/spool/.
+     * @brief Checks if the specified path is allowlisted.
      * @param path The path to check.
      * @return True if the path is not a concern, false otherwise.
      */
     bool is_whitelist_path(const string &path);
 };
 
-#endif // EVENT_DETECTOR_H
+#endif

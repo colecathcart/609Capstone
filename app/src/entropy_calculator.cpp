@@ -26,10 +26,7 @@ const unordered_map<BYTE, int> EntropyCalculator::base64_set = {
     {'3', 55}, {'4', 56}, {'5', 57}, {'6', 58}, {'7', 59}, {'8', 60}, {'9', 61}, {'+', 62}, {'/', 63}, 
 };
 
-EntropyCalculator::EntropyCalculator(): buffer_size(1024), logger(Logger::getInstance()) {
-}
-
-EntropyCalculator::EntropyCalculator(int buff_size_kb): buffer_size(buff_size_kb * 1024), logger(Logger::getInstance()) {
+EntropyCalculator::EntropyCalculator(): logger(Logger::getInstance()) {
 }
 
 bool EntropyCalculator::is_small_file(const string& filepath) const {
@@ -274,8 +271,6 @@ bool EntropyCalculator::monobit_test(const string& filepath, int hits) const {
                 num_passed_blocks++;
             } 
         }
-        
-        // cout << num_passed_blocks << " / " << num_blocks << " blocks passed" << endl;
     
         if (num_passed_blocks / num_blocks >= 0.9) {
             file.close();

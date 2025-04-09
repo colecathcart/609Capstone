@@ -25,12 +25,6 @@ class EntropyCalculator
         EntropyCalculator();
 
         /**
-         * @brief Constructor.
-         * @param buff_size_kb The size of buffer (in KB) to read in at a time.
-         */
-        EntropyCalculator(int buff_size_kb);
-
-        /**
          * @brief Function to calculate if a given file has high entropy blocks
          * @param filepath The path to the file to be tested.
          * @param hits The number of times the process has been seen, used to increase the amount of the file
@@ -40,8 +34,8 @@ class EntropyCalculator
 
         /**
          * @brief Function to perform the NIST monobit test on a given file.
-         * A true result denotes that 90% or more of the blocks in the file
-         * (determined by the buffer_size) passed the test.
+         * A true result denotes that 90% or more of the blocks in the file chunk
+         * (determined by hits) passed the test.
          * @param filepath The path to the file to be tested.
          * @param hits The number of times the process has been seen, used to increase the amount of the file
          * for which the test is calculated.
@@ -49,31 +43,28 @@ class EntropyCalculator
         bool monobit_test(const string& filepath, int hits) const;
 
         /**
-         * @brief Function to get the SHA256 hash of the file, for the purpose of comparison.
-         * @param filepath The path to the file to be tested.
+         * @brief Function to get the SHA256 hash of the file.
+         * @param filepath The path to the file to be hashed.
          */
         string get_file_hash(const string& filepath) const;
     
     private:
 
         /**
-         * @brief The size of buffer (in Bytes) to be read from a file at a time
-         */
-        const size_t buffer_size;
-        /**
-         * @brief All valid base64 characters, along with their positions, for efficiently decoding
+         * @brief All valid base64 characters, along with their positions, for efficiently decoding.
          */
         static const unordered_map<BYTE, int> base64_set;
         /**
-         * @brief Reference to singleton logger
+         * @brief Reference to singleton logger.
          */
         Logger& logger;
         /**
-         * @brief Helper function to ignore small files (< 1 KB)
+         * @brief Helper function to ignore small files (< 1 KB).
          */
         bool is_small_file(const string& filepath) const;
         /**
-         * @brief Helper function to check for and perform decoding in base64
+         * @brief Helper function to check for and perform decoding in base64.
+         * Adapted from this code (open license): https://github.com/ReneNyffenegger/cpp-base64 
          */
         vector<BYTE> decode(vector<BYTE>& buffer, size_t length) const;
 };
