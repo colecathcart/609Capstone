@@ -44,7 +44,7 @@ void MainWindow::update(const bool isOn, const double cpu, const double mem, con
 
     // Update the memory progress bar with 2 decimal places
     ui->memProgressBar->setValue(static_cast<int>(mem));  // Update the actual progress value
-    ui->memProgressBar->setFormat(QString::number(mem, 'f', 2) + "%");
+    ui->memProgressBar->setFormat(QString::number(mem, 'f', 2) + "MB");
 
     if (log != "") {
         ui->loggingText->append(log);

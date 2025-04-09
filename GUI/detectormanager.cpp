@@ -6,7 +6,7 @@
 DetectorManager::DetectorManager() {}
 
 void DetectorManager::startDetector() {
-    QString detectorPath = QDir::cleanPath(QCoreApplication::applicationDirPath() + "../../../../app/ransomware_detector");
+    QString detectorPath = QDir::cleanPath(QCoreApplication::applicationDirPath() + "/../app/ransomware_detector");
     QString program = QString("%1 / 2").arg(detectorPath);
 
     QString workingDir = QFileInfo(detectorPath).absolutePath();
