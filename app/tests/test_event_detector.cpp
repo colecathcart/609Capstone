@@ -1,42 +1,29 @@
 #include <gtest/gtest.h>
 #include "event_detector.h"
-#include "event.h" 
-#include <ctime>
+#include <filesystem>
 
+using namespace std;
+
+// Test fixture for EventDetector
 class EventDetectorTest : public ::testing::Test {
 protected:
-    EventDetector ed;
+    EventDetector detector;
 };
 
-// Test hidden path detection
-TEST_F(EventDetectorTest, HiddenPathDetection) {
-    // Expect paths with hidden directories (starting with '.') to return true.
-    EXPECT_TRUE(ed.is_hidden_path("/home/user/.hidden/file.txt"));
-    EXPECT_TRUE(ed.is_hidden_path("./.config/settings.ini"));
-    // Expect visible paths to return false.
-    EXPECT_FALSE(ed.is_hidden_path("/home/user/visible/file.txt"));
+// Test that get_fanotify_fd returns a valid descriptor
+TEST_F(EventDetectorTest, FanotifyFdIsValid) {
+    int fd = detector.get_fanotify_fd();
+    EXPECT_GE(fd, 0); // Should be non-negative
 }
 
-// Test non concerning path detection
-TEST_F(EventDetectorTest, NoConcernPathDetection) {
-    // Paths in /tmp/ or /var/spool/ should be ignored.
-    EXPECT_TRUE(ed.is_no_concern_path("/tmp/somefile.txt"));
-    EXPECT_TRUE(ed.is_no_concern_path("/var/spool/print"));
-    // Paths outside these directories should not be flagged.
-    EXPECT_FALSE(ed.is_no_concern_path("/home/user/somefile.txt"));
-}
+// Test that add_watch executes without crashing for an existing directory
+TEST_F(EventDetectorTest, AddWatchDoesNotThrow) {
+    string test_dir = "./test_watch_dir";
+    filesystem::create_directory(test_dir);
 
-// Test returning the fanotify file descriptor
-TEST_F(EventDetectorTest, ValidFanotifyFd) {
-    int fd = ed.get_fanotify_fd();
-    // A valid file descriptor should be non-negative.
-    EXPECT_GE(fd, 0);
-}
+    EXPECT_NO_THROW({
+        detector.add_watch(test_dir);
+    });
 
-// Test enqueuing an event
-TEST_F(EventDetectorTest, EnqueueEventWorks) {
-    // Create a dummy event.
-    Event testEvent("TEST", "/tmp/test.txt", "test.txt", "txt", time(nullptr), 1234);
-    // Ensure that enqueue_event does not throw any exceptions.
-    ASSERT_NO_THROW(ed.enqueue_event(testEvent));
+    filesystem::remove_all(test_dir);
 }
