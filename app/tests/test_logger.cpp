@@ -3,13 +3,16 @@
 #include <fstream>
 #include <cstdio>
 
+using namespace std;
+
+// // Test fixture for Logger
 class LoggerTest : public ::testing::Test {
 protected:
     Logger& logger = Logger::getInstance();
 
     void SetUp() override {
         logger.set_destination(1); // Log to file
-        std::ofstream ofs("log.txt", std::ios::trunc); // Clear log file before test
+        ofstream ofs("log.txt", ios::trunc); // Clear log file before test
         ofs.close();
     }
 
@@ -18,19 +21,21 @@ protected:
     }
 };
 
+// Test same instance of the singleton Logger is returned
 TEST_F(LoggerTest, SingletonReturnsSameInstance) {
     Logger& second = Logger::getInstance();
     EXPECT_EQ(&logger, &second); // Compare addresses since we're using references
 }
 
+// Test logging to file
 TEST_F(LoggerTest, LogsToFileCorrectly) {
-    std::string test_msg = "Test log message";
+    string test_msg = "Test log message";
     logger.log(test_msg);
 
-    std::ifstream file("log.txt");
-    std::string line;
+    ifstream file("log.txt");
+    string line;
     bool found = false;
-    while (std::getline(file, line)) {
+    while (getline(file, line)) {
         if (line == test_msg) {
             found = true;
             break;

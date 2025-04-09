@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+
 using namespace std;
 
 // Test fixture for Analyzer

@@ -81,19 +81,25 @@ TEST_F(EntropyCalculatorTest, FileHashGeneration) {
     EXPECT_EQ(hash.length(), 64) << "SHA256 hash should be 64 hex characters";
 }
 
-// Benchmark test for 100mb file entropy calculation
+// Benchmark test that processes first 100MB of a ~104MB file
 TEST_F(EntropyCalculatorTest, LargeFileEntropyBenchmark) {
     auto start = high_resolution_clock::now();
+
+    // Reads first 100 MB based on hit level 5
     double entropy = calculator.calc_shannon_entropy(large_test_file, 5);
+
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start).count();
 
-    double file_size_mb = 100;
+    // We are only reading 100 MB, even though file size is 104 MB
+    double file_size_read_mb = 100; 
 
-    double speed = file_size_mb / (duration / 1000.0);
+    double speed = file_size_read_mb / (duration / 1000.0); // MB per second
 
-    cout << "File entropy calculation based on first 100mb of a large file took " << duration << " ms (" << speed << " MB/s)" << endl;
+    cout << "Entropy calculation over first 100MB of a 104MB file took " 
+         << duration << " ms (" << speed << " MB/s)" << endl;
 
     EXPECT_GT(entropy, 0) << "Entropy calculation should complete successfully";
 }
+
 

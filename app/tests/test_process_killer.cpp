@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <filesystem>
+
 using namespace std;
 
 // Derived class to override the user prompt for testing.
@@ -15,6 +16,7 @@ protected:
     }
 };
 
+// Test fixture for ProcessKiller
 class ProcessKillerTest : public ProcessKiller, public ::testing::Test {
 protected:
     ProcessKiller pk; 
