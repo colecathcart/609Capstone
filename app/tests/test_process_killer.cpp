@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <filesystem>
+
 using namespace std;
 
 // Derived class to override the user prompt for testing.
@@ -15,6 +16,7 @@ protected:
     }
 };
 
+// Test fixture for ProcessKiller
 class ProcessKillerTest : public ProcessKiller, public ::testing::Test {
 protected:
     ProcessKiller pk; 
@@ -29,7 +31,7 @@ TEST_F(ProcessKillerTest, GetExecutablePathValid) {
 
 // Test that getExecutablePath returns an empty string for an invalid PID
 TEST_F(ProcessKillerTest, GetExecutablePathInvalid) {
-    // Use an unlikely PID (adjust if necessary)
+    // Use an unlikely PID
     pid_t invalid_pid = 999999;
     string path = pk.getExecutablePath(invalid_pid);
     EXPECT_TRUE(path.empty());

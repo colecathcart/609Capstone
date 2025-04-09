@@ -3,7 +3,9 @@
 #include "event.h"
 #include <ctime>
 #include <string>
+#include <fstream>
 #include <iostream>
+
 using namespace std;
 
 // Test fixture for Analyzer
@@ -12,15 +14,14 @@ protected:
     Analyzer analyzer;
 };
 
-// Test whether suspicious file extension triggers removal
+// Test suspicious file extension should immediately trigger removal
 TEST_F(AnalyzerTest, SuspiciousFileExtensionTriggersRemoval) {
     time_t now = time(nullptr);
 
-    // Using ".crypt" to simulate a suspicious extension.
+    // ".crypt" is in the blacklist.
     Event event("FAN_CLOSE_WRITE",
                 "tests/test_files/ransomware.crypt",
                 "ransomware.crypt",
-                "crypt",
                 now,
                 1001);
 
@@ -28,19 +29,17 @@ TEST_F(AnalyzerTest, SuspiciousFileExtensionTriggersRemoval) {
     analyzer.analyze(event);
     string output = testing::internal::GetCapturedStdout();
 
-    // Expect output to include "flagging for removal".
     EXPECT_NE(output.find("flagging for removal"), string::npos);
 }
 
-// Test monobit result for compressed file triggers watch update
-TEST_F(AnalyzerTest, CompressedFileMonobitTestPassesUpdatesWatch) {
+// Test compressed file triggers monobit suspicion (entropy-based)
+TEST_F(AnalyzerTest, CompressedFileMonobitTriggersSuspicion) {
     time_t now = time(nullptr);
 
-    // "encrypted_compressed.zip" is assumed high-entropy (e.g., truly encrypted).
+    // Assuming encrypted_compressed.zip is suspicious.
     Event event("FAN_CLOSE_WRITE",
                 "tests/test_files/encrypted_compressed.zip",
                 "encrypted_compressed.zip",
-                "zip",
                 now,
                 1002);
 
@@ -48,19 +47,16 @@ TEST_F(AnalyzerTest, CompressedFileMonobitTestPassesUpdatesWatch) {
     analyzer.analyze(event);
     string output = testing::internal::GetCapturedStdout();
 
-    // Expect "is suspicious, updating watch" in the output.
-    EXPECT_NE(output.find("is suspicious, updating watch"), string::npos);
+    EXPECT_NE(output.find("flagging for removal"), string::npos);
 }
 
-// Test low entropy file is not suspicious
+// Test low-entropy file should not be flagged
 TEST_F(AnalyzerTest, LowEntropyFileIsNotSuspicious) {
     time_t now = time(nullptr);
 
-    // "plain_text.txt" should have lower entropy.
     Event event("FAN_CLOSE_WRITE",
                 "tests/test_files/plain_text.txt",
                 "plain_text.txt",
-                "txt",
                 now,
                 1004);
 
@@ -68,38 +64,57 @@ TEST_F(AnalyzerTest, LowEntropyFileIsNotSuspicious) {
     analyzer.analyze(event);
     string output = testing::internal::GetCapturedStdout();
 
-    // Expect "is not suspicious" in the output.
     EXPECT_NE(output.find("is not suspicious"), string::npos);
 }
 
-// Test repeated suspicious events removal
-TEST_F(AnalyzerTest, UpdateWatchTriggersRemovalOnRepeatedSuspicion) {
-    // Simulate the same PID being suspicious twice within an hour.
+// Test whitelisted high-entropy files (like ZIPs) are not flagged if normal
+TEST_F(AnalyzerTest, WhitelistedHighEntropyExtensionPassesMonobitTest) {
     time_t now = time(nullptr);
 
-    Event event1("FAN_CLOSE_WRITE",
-                 "tests/test_files/encrypted_image.jpg",
-                 "encrypted_image.jpg",
-                 "jpg",
-                 now,
-                 1005);
+    // This ZIP file should be in the whitelist and not suspicious.
+    Event event("FAN_CLOSE_WRITE",
+                "tests/test_files/plain_compressed.zip",
+                "plain_compressed.zip",
+                now,
+                1003);
 
-    // 100 seconds later—still within 3600s threshold.
-    Event event2("FAN_CLOSE_WRITE",
-                 "tests/test_files/encrypted_image.jpg",
-                 "encrypted_image.jpg",
-                 "jpg",
-                 now + 100,
-                 1005);
-
-    // First call: should update watch (suspicious).
-    analyzer.analyze(event1);
-
-    // Second call: triggers removal because it’s the same PID again soon.
     testing::internal::CaptureStdout();
-    analyzer.analyze(event2);
-    string output2 = testing::internal::GetCapturedStdout();
+    analyzer.analyze(event);
+    string output = testing::internal::GetCapturedStdout();
 
-    // Expect "flagging for removal" in the second output.
-    EXPECT_NE(output2.find("flagging for removal"), string::npos);
+    EXPECT_NE(output.find("is not suspicious"), string::npos);
+}
+
+// Test small files are skipped and not flagged
+TEST_F(AnalyzerTest, SmallFileIsIgnored) {
+    time_t now = time(nullptr);
+
+    Event event("FAN_CLOSE_WRITE",
+                "tests/test_files/small_file.txt",
+                "small_file.txt",
+                now,
+                1010);
+
+    testing::internal::CaptureStdout();
+    analyzer.analyze(event);
+    string output = testing::internal::GetCapturedStdout();
+
+    EXPECT_NE(output.find("is not suspicious"), string::npos);
+}
+
+// Test blacklisted extensions should trigger immediate suspicion
+TEST_F(AnalyzerTest, BlacklistedExtensionImmediateRemoval) {
+    time_t now = time(nullptr);
+
+    Event event("FAN_CLOSE_WRITE",
+                "tests/test_files/fake_ransom.locked",
+                "fake_ransom.locked",
+                now,
+                1011);
+
+    testing::internal::CaptureStdout();
+    analyzer.analyze(event);
+    string output = testing::internal::GetCapturedStdout();
+
+    EXPECT_NE(output.find("flagging for removal"), string::npos);
 }

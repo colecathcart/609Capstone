@@ -9,6 +9,10 @@ SRC = src/main.cpp src/entropy_calculator.cpp src/file_extension_checker.cpp src
       src/event_detector.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp \
       src/websocket_server.cpp src/thread_pool.cpp
 
+TEST_SRC = src/entropy_calculator.cpp src/file_extension_checker.cpp src/event.cpp \
+           src/event_detector.cpp src/analyzer.cpp src/process_killer.cpp src/logger.cpp \
+           src/websocket_server.cpp src/thread_pool.cpp
+
 # Object files (store in build/)
 OBJ = $(SRC:src/%.cpp=build/%.o)
 
@@ -32,11 +36,13 @@ $(WS_APP): build/websocket_main.o build/websocket_server.o
 	$(CXX) build/websocket_main.o build/websocket_server.o $(LDFLAGS) -lpthread -o $(WS_APP)
 
 # Test runner
-test: $(SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp \
-      tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp
-	$(CXX) $(SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp \
+test: $(TEST_SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp tests/test_file_extension_checker.cpp \
+      tests/test_event_detector.cpp tests/test_analyzer.cpp tests/test_process_killer.cpp tests/test_logger.cpp tests/test_event.cpp \
+	  tests/test_thread_pool.cpp 
+	$(CXX) $(CXXFLAGS) $(TEST_SRC) tests/test_main.cpp tests/test_entropy_calculator.cpp \
 	tests/test_file_extension_checker.cpp tests/test_event_detector.cpp \
-	tests/test_analyzer.cpp tests/test_process_killer.cpp $(LDFLAGS) $(LDLIBS) -o $(TEST_APP)
+	tests/test_analyzer.cpp tests/test_process_killer.cpp tests/test_logger.cpp tests/test_event.cpp tests/test_thread_pool.cpp \
+	 $(LDFLAGS) $(LDLIBS) -o $(TEST_APP)
 	sudo ./$(TEST_APP)
 
 # Pattern rule for compiling source files
