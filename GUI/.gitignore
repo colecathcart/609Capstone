@@ -27,6 +27,7 @@ Makefile*
 *.prl
 *.app
 moc_*.cpp
+moc_*.h
 ui_*.h
 qrc_*.cpp
 Thumbs.db
@@ -72,6 +73,7 @@ CMakeLists.txt.user*
 # --------
 *.dll
 *.exe
+GUI
 
 # Directories with generated files
 .moc/

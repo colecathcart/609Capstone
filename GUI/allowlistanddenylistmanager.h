@@ -4,8 +4,8 @@
 #include <QStringList>
 #include <QStringListModel>
 
-#define BLACKLIST_EXTENSIONS_PATH  "../../../app/data/blacklist_extensions.txt"
-#define WHITELIST_DIRS_PATH  "../../../app/data/whitelist_dirs.txt"
+#define BLACKLIST_EXTENSIONS_PATH  "../app/data/blacklist_extensions.txt"
+#define WHITELIST_DIRS_PATH  "../app/data/whitelist_dirs.txt"
 
 
 class AllowListAndDenyListManager
