@@ -43,7 +43,7 @@ You may also need to install pyinstaller:
     pyinstaller -F --clean decryptor.py -n decryptor
 
 # Running the code
-Ensure you unzip files2encrypt.zip **inside** encryption_zone/GonnaCry directory and navigate there with your terminal.
+From the `/GonnaCry` diretory, unzip the `files2encrypt.zip` folder. GonnaCry will attempt to encrypt the files inside this folder.
 
 To encrypt all files in files2encrypt: directly run main.py, or:
     
