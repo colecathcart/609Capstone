@@ -7,6 +7,8 @@ linux-libc-dev
 libsqlite3-dev
 sqlite3
 libboost-all-dev
+libgl1-mesa-dev
+libxcb-cursor0
 nodejs
 npm
 python3 
