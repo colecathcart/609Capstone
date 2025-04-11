@@ -70,6 +70,6 @@ Navigate into the /GUI directory inside the project folder and enter the full pa
 - Currently, the GUI will **not** automatically start the websocket client when it starts the detector. If you want to connect to the dashboard, please activate that executable first (see **Ransomware Detector** section above).
 
 ### Dashboard
-The dashboard is intended to be used by a system administrator to monitor the health of a local network of computers. It will only recognize devices on the local network. It has been adapted from [this puclicly shared template](https://github.com/burakorkmez/react-admin-dashboard/tree/master).
+The dashboard is intended to be used by a system administrator to monitor the health of a local network of computers. It will only recognize devices on the local network. It has been adapted from [this publicly shared template](https://github.com/burakorkmez/react-admin-dashboard/tree/master).
 
 Navigate into the `/dashboard` directory and run the command `npm install` to automatically install all required packages. Then run `npm run dev` to open the dashboard in a web browser. To connect a device to the detector, follow the steps outlined in the **Ransomware Detector** section above.
