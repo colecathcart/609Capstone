@@ -56,6 +56,7 @@ Due to difficulties encountered with linking the Qt packages, you must create an
 1. Create a free Qt account [here](https://login.qt.io/register). You will need to login with this account after downloading the installer.
 2. Download the open source Qt installer [here](https://www.qt.io/download-qt-installer-oss).
 3. Give the installer execution permissions and then run the installer. You will be prompted to login with your account.
+4. Choose 'Qt 6.9 for desktop development' when asked to select package.
 
 Once the install is complete, you must take note of the path to the `qmake` executable on your system. It should be located at
 `/home/<user>/Qt/6.9.0/<architecture>/bin/qmake`
