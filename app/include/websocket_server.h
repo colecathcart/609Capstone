@@ -2,6 +2,9 @@
 #define WEBSOCKET_SERVER_H
 
 #include <string>
+#include <websocketpp/client.hpp>
+#include <websocketpp/config/asio_no_tls_client.hpp>
+#include <websocketpp/config/asio_no_tls.hpp>
 using namespace std;
 /**
  * @brief Starts the WebSocket++ server (host mode)
@@ -37,6 +40,10 @@ string get_combined_payload();
  */
 string get_device_name();
 
+/**
+ * @brief Returns the client instance
+ */
+websocketpp::client<websocketpp::config::asio>& get_websocket_client();
 
 /**
  * @brief Increment a numeric field in system_stats

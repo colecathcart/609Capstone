@@ -37,6 +37,10 @@ string get_device_name() {
     return string(hostname);
 }
 
+websocketpp::client<websocketpp::config::asio>& get_websocket_client() {
+    return ws_client;
+}
+
 // Sends a text message to all connections currently tracked
 void broadcast(const string& message) {
     for (auto& hdl : connections) {

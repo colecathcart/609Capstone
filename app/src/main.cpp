@@ -7,6 +7,9 @@
 #include "event_detector.h"
 #include "file_extension_checker.h"
 #include "websocket_server.h"
+#include <websocketpp/client.hpp>
+#include <websocketpp/config/asio_no_tls_client.hpp>
+#include <websocketpp/config/asio_no_tls.hpp>
 #include <atomic>
 #include <thread_pool.h>
 
@@ -57,6 +60,7 @@ int main(int argc, char* argv[]) {
 
     logger.log("\nstopping detector.");
     if(ws_client_thread.joinable()) {
+        get_websocket_client().stop();
         ws_client_thread.join();
     }
 
