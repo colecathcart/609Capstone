@@ -27,7 +27,7 @@ included in a standard Ubuntu installation, so we have compiled many of them int
 **Prerequesites**
 - Ubuntu 24.04 LTS
 
-If your system has the above prerequesites, simply clone the repository, navigate to the project directory and run `sudo apt install requirements.txt` from a terminal.
+If your system has the above prerequesites, simply clone the repository, navigate to the project directory and run `sudo xargs apt install -y < requirements.txt` from a terminal.
 Then continue with the steps below for compiling individual programs.
 
 ### Ransomware Detector
