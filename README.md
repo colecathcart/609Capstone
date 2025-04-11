@@ -55,14 +55,14 @@ located in `encryption_zone/GonnaCry/README.md`.
 Due to difficulties encountered with linking the Qt packages, you must create an account and download the Qt installer in order to run the GUI:
 1. Create a free Qt account [here](https://login.qt.io/register). You will need to login with this account after downloading the installer.
 2. Download the open source Qt installer [here](https://www.qt.io/download-qt-installer-oss).
-3. Give the installer execution permissions and then run the installer. You will be prompted to login with your account.
+3. Give the installer execution permissions and then run the installer. You will be prompted to login with your account. Ignore any warnings about missing packages.
 4. Choose 'Qt 6.9 for desktop development' when asked to select package.
 
 Once the install is complete, you must take note of the path to the `qmake` executable on your system. It should be located at
 `/home/<user>/Qt/6.9.0/<architecture>/bin/qmake`
 - Replace `<user>` with your computer username. Replace `<architecture>` with either `gcc_64` or `gcc_arm64` depending on the version of Qt you installed
 
-Navigate into the /GUI directory inside the project folder and enter the full path you just determined into the terminal. This will generate a makefile (this only needs to be done once). To activate the GUI, run `sudo ./GUI` from the same directory. 
+Navigate into the /GUI directory inside the project folder and enter the full path you just determined into the terminal. This will generate a makefile (this only needs to be done once). Run `make`, then to activate the GUI, run `sudo ./GUI`. 
 - To start the detector, click the 'Start detector' button in the interface. The directory allowlist and extension blacklist can be edited from their corresponding tabs (the detector must be restarted to take effect).
 - Note that the GUI and ransomware detector are standalone programs by design. This means that the ransomware detector must be compiled into an executable before running the GUI (see above steps).
 - Additionally, closing the GUI window will not close the detector (this is intentional). To stop the detector, please click the corresponding button in the interface.
