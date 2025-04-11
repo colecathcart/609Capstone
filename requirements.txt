@@ -1,0 +1,15 @@
+build-essential
+cmake
+pkg-config
+libssl-dev
+libmagic-dev
+linux-libc-dev
+libsqlite3-dev
+sqlite3
+libboost-all-dev
+nodejs
+npm
+python3 
+python3-pip 
+python3-venv 
+python3-dev

@@ -26,9 +26,6 @@ included in a standard Ubuntu installation, so we have compiled many of them int
 
 **Prerequesites**
 - Ubuntu 24.04 LTS
-- C++ 17+
-- Python 3+ (to use the GonnaCry sample)
-- NodeJS and Node Package Manager (to use the dashboard)
 
 If your system has the above prerequesites, simply clone the repository, navigate to the project directory and run `sudo apt install requirements.txt` from a terminal.
 Then continue with the steps below for compiling individual programs.
